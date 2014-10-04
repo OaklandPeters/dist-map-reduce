@@ -1,0 +1,32 @@
+Based upon your lower-level programming experience (as a Data Engineer and/or Systems Engineer), I would like to see what you do with the following problem set. This is a largely open-ended problem, but be prepared to discuss your solution if asked about it. 
+
+The goal: Create an efficient solution to the scenario below. 
+
+Problem scenario: Websites often want to calculate unique visitors to a site. We'd like to be able to query whether or not a particular IP address has visited a site within a particular time frame. Logs can be generated (via the script, at the bottom of this email) in the form of newline separated IP addresses. For problem simplification purposes, let's say we're talking about just IPv4. Please describe any assumptions, limitations, and/or dependencies (packages, operating systems, odd initial/temp disks/memory requirements, etc.) your solution has. 
+
+The assignment: Create a solution that is as efficient as possible. Efficient may be defined however you'd like, but consider space (disk and memory) and time (lookup and loading) constraints. Ideally we are looking for a scaleable solution. Let’s assume that we have a particularly busy site; we have around half of a billion unique IP addresses a month visiting us. 
+
+Requirement: Create your solution ideally in Python or pick a language that you’re most comfortable with. Post your work to github.com (and/or email me a Zip File), committing frequently. 
+
+How you work is just as important as the final result. 
+Please let me know if you have any questions. Thanks. 
+
+Best regards, 
+Pintu Sethi 
+www.endgame.com 
+
+[IP/input Generator] 
+
+#!/usr/bin/env python 
+import sys, random 
+
+def main(count): 
+for x in xrange(count): 
+first_number = random.randint(0, 255) 
+second_number = random.randint(0, 255) 
+third_number = random.randint(0, 255) 
+fourth_number = random.randint(0, 255) 
+print "%d.%d.%d.%d" % (first_number, second_number, third_number, fourth_number)
+
+if __name__ == "__main__": 
+main(int(sys.argv))
