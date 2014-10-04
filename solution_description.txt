@@ -1,0 +1,15 @@
+Describe context of solution:
+	assumptions
+	limitations
+	dependencies
+		packages
+		operating systems
+		temp disks
+		memory requirements
+
+
+Describe efficiency constraints:
+	Space: disk
+	Space: memory
+	Time: lookup
+	Time: loading

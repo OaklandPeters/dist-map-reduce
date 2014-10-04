@@ -46,9 +46,6 @@ Tests
 -----------
 *to be filled in after the `0.Test` step is finished*
 
-Contributors
-------------
-Oakland John Peters, developed for `Endgame Inc. <https://www.endgame.com/>`_, based on a problem statement provided by Pintu Sethi.
 
 Solutions
 =============
@@ -58,9 +55,14 @@ v1: Naive
 
 ::
 
-  "Programmers waste enormous amounts of time thinking about, or worrying about, the speed of noncritical parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered. We should forget about small efficiencies, say about 97% of the time: *premature optimization is the root of all evil*. Yet we should not pass up our opportunities in that critical 3%."
+  "Programmers waste enormous amounts of time thinking about, or worrying 
+  about, the speed of noncritical parts of their programs, and these attempts 
+  at efficiency actually have a strong negative impact when debugging and 
+  maintenance are considered. We should forget about small efficiencies, 
+  say about 97% of the time: *premature optimization is the root of all evil*. 
+  Yet we should not pass up our opportunities in that critical 3%."
   
-  -'Donald Knuth'
+  -*Donald Knuth*
 
 This step will be building the 'naive' case, and time/space testing it, on realistic data, and using that to make predictions for the actual data-size, hardware, and preformance requirements. What is the `Naive`, and why are we doing it?
 
@@ -70,13 +72,17 @@ Baseline
   First, as a baseline for comparing later answers. This lets us evaluate the improvements and tradeoffs of later prototyped solution(s).
 
 Finish-line
-  Secondly, the naive solution helps us gauge how far the solution need to be improved. For example, if the naive solution is O(N^2) and has a run-time on the total data of 1 hour (X) using given hardware (Y), then by comparing that to target performance (Z), we can gauge the necessary algorithmic performance. IE whether we need to achieve: 1/5 * O(N^2), O(N * log N), or O(N) ?
+  Secondly, the naive solution helps us gauge how far the solution need to be improved. For example, if the naive solution is O(N^2) and has a run-time on the total data of 1 hour (X) using given hardware (Y), then by comparing that to target performance (Z), we can gauge the necessary algorithmic performance. IE whether we need to achieve: 1/5 * O(N^2), O(N * log N), or O(N) preformance from our algorithm and data-structures?
 
 Occassional Sufficiency
-  Finally, the naive solution is actually efficient enough a surprisingly large fraction of the time. In real world cases (IE *not this exercise*), the naive solution, even with its vast inefficiencies, occassionally turns out to deliver everything the client needs. For example, if the naive solution is an O(n^2) scan of log files, but the client has only 10,000 records in those files - then the total run time is likely to be well below 1 second, and hence likely a totally acceptable preformance level. Importantly, the total developer time taken, and therefore cost, of this will be approximately 1/50th of actually implementing a clever and efficient solution.
+  Finally, in a surprisingly large fraction of real-world cases, the naive solution is actually efficient enough. In real world cases (IE *not this exercise*), the naive solution, even with its vast inefficiencies, occassionally turns out to deliver everything the client needs. For example, if the naive solution is an O(n^2) scan of log files, but the client has only 10,000 records in those files - then the total run time is likely to be well below 1 second, and hence likely a totally acceptable preformance level. Importantly, the total developer time taken, and therefore cost, of this will be approximately 1/50th of actually implementing a clever and efficient solution.
 
+
+
+Contributors
+------------
+Oakland John Peters, developed for `Endgame Inc. <https://www.endgame.com/>`_, based on a problem statement provided by Pintu Sethi.
   
-
 License
 -----------
 The MIT License (MIT)
