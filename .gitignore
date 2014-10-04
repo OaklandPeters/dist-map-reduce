@@ -1,0 +1,12 @@
+# Python compiled files
+*.pyc
+
+# Eclipse project files
+.project
+.pydevproject
+
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+
