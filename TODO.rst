@@ -1,29 +1,35 @@
 Immediate work-plan
 -----------------------
 
-1. Pull more recent versions of sqlfront
-2. Git script - update things
-3. Make repo for challenge: name?
-4. Make notes documenting thought process - esp "Why"
-  4.1 Initial plan & why
-    4.1.1 deploy data - creating raw files
-      4.1.1.1 Full 1 billion
-      4.1.1.2 Randomized builder
-      4.1.1.3 Smaller 'test-ready' chunks
-    4.1.2 Time/space test tools
-    4.1.3 Building the 'naive' case, and time/space testing it, on realistic data, with predictions for the your actual data-size, hardware, and preformance requirements. Why?
-      4.1.4.1 Baseline for comparing later answers. Lets you know when, how much, in what ways, and the tradeoffs of newly prototyped solution(s).
-      4.1.4.2 How far does it need to be improved?
-			O(N^2) --> 1/5 * O(N^2) or O(N * log N) or O(N) ?
-      4.1.4.3 Sometimes naive is good enough.
-			Not for this task, but in more 'real-world' cases - the
-			naive approach turns out to work out for the conditions
-			in front of you. For example, problem, know the naive solution is O(n^2).
-			However, time testing this on the client's data (only 50,000 records)
-			it turns out this takes ~1 second, and is hence totally acceptable
-			to the client. Total developer time taken == 1/50th of actually implementing
-			any clever solution.
+[] Read problem_statement CAREFULLY
+	[] Make notes
+	[] Step 1: Make data for 100,000 records + timestamp
+		[] Gauge size of single record: memory and on disk:
+	[] Step 2: Timeit: linear scan on hard-drive: 
+	[] Step 4: Load into memory: records
+	[] Step 3: Timeit: linear scan in memory
 
+[] Need to write about assumption: files are written to *in-order*
+	[] either logs are written that way, or server collects access logs
+		... order them, and writes them to a file
+
+[] Chunking data + central index
+	[] Overall input: time range + ip address list
+	[] computational units: in central index:
+		lists time range contained in that index + communication interface
+	[] finds the computational units fitting that time range, and sends quarry to them
+		[] Quary: time-range + ip
+		[] For self, find all records in that time range
+			[] Have to do a smart search shinanagin
+		[] Then filter those results by the IP address list
+	
+	
+Problem notes:
+[] Ideally *scalable* solution
+[] Data-size: billion unique IP addresses/month
+[] Total # IPv4 Addresses: 256^4: 4294967296 ~ 4.3 million
+[] Forward task: time --> IP: finding entry from sorted list
+[] Reverse task: IP --> times: needs a hash
 			
 Big Picture plan
 ------------------
@@ -44,3 +50,6 @@ Big Picture plan
 - multiprocessing
 - splitting source file
   * distributed?
+  
+- cleanup: describe solution context/assumptions, as describing in problem statement
+  * Fill in document/template: solution_description.txt

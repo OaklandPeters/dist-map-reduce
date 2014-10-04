@@ -38,6 +38,8 @@ Overall Solution Strategy
 ----------------------------
 Develop solutions which are incrementally more complex and efficient, while documenting the motivations for each step. Step '0' is setting up a data-generator, the package documents, and a time/space (~memory) testing framework.
 
+My personal goal is to see *how close* I can come to an 'enterprise-ready' solution before deadline (Monday morning ~36 hours away).
+
 Installation
 ------------
 *to be filled in after the `0.Build` step is finished*
