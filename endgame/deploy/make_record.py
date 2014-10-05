@@ -3,9 +3,20 @@ import sys
 import random
 import datetime
 import csv
+from ..timerange import datetime_to_timestamp
+from ..interfaces import Record
 
+__all__ = [
+    'write_records_csv',
+    'read_records_csv',
+    'convert_records_csv',
+    'read_records',
+    'IPv4',
+    'TimeStamp'
+]
 
-def main(count): 
+def main(count):
+    """The original function given in the problem statement."""
     for x in xrange(count): 
         first_number = random.randint(0, 255)
         second_number = random.randint(0, 255)
@@ -25,20 +36,20 @@ def TimeStamp(start=None, interval=None):
     """Factory for TimeStamps.
     start: None --> use now
     interval: None --> at start
-        int --> seconds after start
+        float --> seconds after start
         function --> execute to get interval (eg. for randomization)
     """
     if start is None:
-        start = datetime.datetime.now().microsecond
+        start = datetime_to_timestamp(datetime.datetime.now())
     if interval is None:
-        interval = 0
+        interval = 0.0
     if callable(interval):
         interval = interval()
     # Typechecking
-    if not isinstance(start, int):
-        raise TypeError("'start' should be an integer.")
-    if not isinstance(interval, int):
-        raise TypeError("'interval' should be an integer.")
+    if not isinstance(start, float):
+        raise TypeError("'start' should be a float.")
+    if not isinstance(interval, float):
+        raise TypeError("'interval' should be a float.")
     return start + interval
 
 def record(ip=None, ts=None):
@@ -48,10 +59,10 @@ def record(ip=None, ts=None):
         ts = TimeStamp()
     return (repr(ip), repr(ts))
 
-def rand_records(count=1000, interval=100):
+def rand_records(count=1000, interval=100.0):
     if interval is None:
         interval = 0
-    if not isinstance(interval, int):
+    if not isinstance(interval, float):
         raise TypeError("'interval' should be an integer.")
     
     for x in xrange(count):
@@ -60,7 +71,7 @@ def rand_records(count=1000, interval=100):
             TimeStamp(start=None, interval=x*interval)
         )
 
-def write_records_csv(filename, count=1000, interval=100):
+def write_records_csv(filename, count=1000, interval=100.0):
     """
     Write to flat CSV file. Why CSV instead of JSON?
     Smaller files, and faster for simple data (which this is).
@@ -79,15 +90,10 @@ def read_records_csv(filename):
 def convert_records_csv(filename):
     for ip, ts in read_records_csv(filename):
         #How to convert?
-        yield ip, int(ts)
-    
-        
+        yield ip, float(ts)
 
-if __name__ == "__main__":
-
-    write_records_csv('100k.csv', count=100000)
-    
-    #Time test this
-    results = list(convert_records_csv('1k.csv'))
-    
-    print()
+def read_records(filename):
+    return [
+        Record(ip, ts)
+        for ip, ts in convert_records_csv(filename)
+    ]

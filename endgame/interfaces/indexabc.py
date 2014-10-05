@@ -5,6 +5,8 @@ class IndexABC(object):
     """
     @todo: Give MutableSequence behavior, based on data. Inherit from BasicMutableSequence
     
+    
+    map should return iterable
     """
     __metaclass__ = abc.ABCMeta
     # Map/Reduce Interface

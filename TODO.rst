@@ -2,6 +2,7 @@ Immediate work-plan
 -----------------------
 
 [] Try query containing timerange on RecordChunk's map/reduce
+	[] Get deploy working again, with new datetime_to_timestamp
 	
 [] Next step: IndexDispatcher
 	[] Stub it

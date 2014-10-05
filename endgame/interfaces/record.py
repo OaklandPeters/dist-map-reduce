@@ -12,8 +12,9 @@ class RecordABC(object):
 
 class Record(RecordABC, tuple):
     def __new__(cls, ip, timestamp):
-        if not isinstance(timestamp, int):
-            timestamp = int(timestamp)
+        ip = validate_property(cls.ip, ip)
+        timestamp = validate_property(cls.timestamp, timestamp)
+                
         return tuple.__new__(cls, [ip, timestamp])
 
     def __str__(self):
@@ -43,10 +44,13 @@ class Record(RecordABC, tuple):
         def _set(self, value):
             self[1] = value
         def _val(self, value):
-            if not isinstance(value, int):
+            if isinstance(value, float):
+                return value
+            elif isinstance(value, (basestring, int, long)):
+                return float(value)
+            else:
                 raise TypeError("'timestamp' should be an integer.")
-            return value
 
-rec = Record('aa',123)
-print(rec)
-print()
+def validate_property(cls_property, value):
+    #validate_property(cls.timestamp, timestamp)
+    return cls_property.__dict__['fval'](None, value)
