@@ -3,7 +3,9 @@ Immediate work-plan
 
 [] Next step: IndexDispatcher
 	[] Stub it
+	[] Write test_indexdispatcher.py
 	[] Make a config file builder
+	
 	[] Setup folder worth of files
 		[] modify file creator for random names.
 		[] create sample config file of names

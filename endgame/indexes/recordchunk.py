@@ -31,7 +31,7 @@ class RecordChunk(IndexABC):
             yield record
         
     def reduce(self, records, query):
-        # Filter by timerange
+        # Filter by the query
         return [
             record
             for record in self.data
@@ -49,3 +49,13 @@ class RecordChunk(IndexABC):
     @property
     def state(self):
         return self.awake
+    def __str__(self):
+        return "{name}({data})".format(
+            name = type(self).__name__,
+            data = str(self.data)
+        )
+    def __repr__(self):
+        return "{name}({data})".format(
+            name = type(self).__name__,
+            data = repr(self.data)
+        )

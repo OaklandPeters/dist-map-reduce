@@ -36,9 +36,7 @@ The IP generator, as provided by the problem statement is:
 
 Overall Solution Strategy
 ----------------------------
-Develop solutions which are incrementally more complex and efficient, while documenting the motivations for each step. Step '0' is setting up a data-generator, the package documents, and a time/space (~memory) testing framework.
-
-My personal goal is to see *how close* I can come to an 'enterprise-ready' solution before deadline (Monday morning ~36 hours away).
+*to be filled in once the solution is solidified*
 
 Installation
 ------------
@@ -49,11 +47,8 @@ Tests
 *to be filled in after the `0.Test` step is finished*
 
 
-Solutions
-=============
-
-v1: Naive
----------------
+Future Optimizations
+---------------------
 
 ::
 
@@ -65,20 +60,6 @@ v1: Naive
   Yet we should not pass up our opportunities in that critical 3%."
   
   -*Donald Knuth*
-
-This step will be building the 'naive' case, and time/space testing it, on realistic data, and using that to make predictions for the actual data-size, hardware, and preformance requirements. What is the `Naive`, and why are we doing it?
-
-The `naive` solution is the simplest and most direct solution that comes to mind. This is usually something close to 'preform a linear scan of the data, checking each possibility as encountered'. It is nearly always terribly inefficient. Why would we spend time on this approach?
-
-Baseline
-  First, as a baseline for comparing later answers. This lets us evaluate the improvements and tradeoffs of later prototyped solution(s).
-
-Finish-line
-  Secondly, the naive solution helps us gauge how far the solution need to be improved. For example, if the naive solution is O(N^2) and has a run-time on the total data of 1 hour (X) using given hardware (Y), then by comparing that to target performance (Z), we can gauge the necessary algorithmic performance. IE whether we need to achieve: 1/5 * O(N^2), O(N * log N), or O(N) preformance from our algorithm and data-structures?
-
-Occassional Sufficiency
-  Finally, in a surprisingly large fraction of real-world cases, the naive solution is actually efficient enough. In real world cases (IE *not this exercise*), the naive solution, even with its vast inefficiencies, occassionally turns out to deliver everything the client needs. For example, if the naive solution is an O(n^2) scan of log files, but the client has only 10,000 records in those files - then the total run time is likely to be well below 1 second, and hence likely a totally acceptable preformance level. Importantly, the total developer time taken, and therefore cost, of this will be approximately 1/50th of actually implementing a clever and efficient solution.
-
 
 
 Contributors

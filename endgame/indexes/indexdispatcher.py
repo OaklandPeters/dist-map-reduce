@@ -1,28 +1,30 @@
 from __future__ import absolute_import
 import os
+import json
 from ..interfaces import IndexABC
 from .recordchunk import RecordChunk
 from .urldispatcher import URLDispatcher
 
+__all__ = ['IndexDispatcher', 'directory_to_config']
+
 class IndexDispatcher(IndexABC):
     """Dispatches to other indexes or record-chunks."""
     def __init__(self, filepath):
-        # Config file, or possibly direct keywords
+        # Config file, or directory
+        if os.path.isdir(filepath):
+            filepath = directory_to_config(filepath)
         self.filepath = filepath
         self.data = None # 'sleeping'
     def map(self, query):
+        self.wake_up()
         return [
             elm.find(query)
             for elm in self.data
         ]
     def reduce(self, records, query):
-        """This step should be changed for RecordChunk indexes
-        """
+        """Does this need to do an filtering?"""
         return sorted(records, key=lambda record: record.timestamp)
 
-    # Map/Reduce Interface
-    #map = abc.abstractmethod(lambda *args, **kwargs: NotImplemented)
-    #reduce = abc.abstractmethod(lambda *args, **kwargs: NotImplemented)
     
     # Wake/Sleep Interface
     @property
@@ -38,6 +40,16 @@ class IndexDispatcher(IndexABC):
         self.data = None
     def wake_up(self):
         self.data = list(self.wake_iter())
+    def __str__(self):
+        return "{name}({data})".format(
+            name = type(self).__name__,
+            data = str(self.data)
+        )
+    def __repr__(self):
+        return "{name}({data})".format(
+            name = type(self).__name__,
+            data = repr(self.data)
+        )
     #---------------- Unfinished
     def wake_iter(self):
         """
@@ -57,20 +69,44 @@ class IndexDispatcher(IndexABC):
                 raise TypeError("Unrecognized element type.")
             
         self.data = list(self.read())
+
     def read(self):
-        pass
+        with open(self.filepath, 'r') as config_file:
+            config = json.load(config_file)
+        return iter(config['data'])
 
     def write(self):
         # ? Do I even need this ?
         pass
 
 
-class DispatcherConfig(object):
-    def __init__(self, dirpath):
-        pass
-    @classmethod
-    def from_folder(cls, dirpath):
-        pass
+
+def directory_to_config(dirpath):
+    """Create a configuration file for dirpath, and return it's filepath.
+    Place the configuration file on level with the directory. IE:
+    parent/
+        {dirpath}/
+        {dirpath}.json
+        
+    """
+    if not os.path.isdir(dirpath):
+        raise ValueError("{0} is not an existing directory.".format(dirpath))
+    # Write config_path: remove trailing seperator
+    if dirpath[-1] == os.sep:
+        config_path = dirpath[:-1] + ".json"
+    else:
+        config_path = dirpath + ".json"
+    #Get all csv files
+    record_files = [os.path.join(dirpath, filepath)
+        for filepath in os.listdir(dirpath)
+        if filepath.endswith('.csv')
+    ]
+    # Write JSON config file
+    with open(config_path, 'w') as config_file:
+        json.dump({'data': record_files}, config_file)
+    return config_path
+    
+    
 
 
 #------------------------------------------------------------------------------
