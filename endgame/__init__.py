@@ -8,7 +8,7 @@ __all__ = [
     'RecordChunk',
 ]
 
-from .interfaces import Query
+from .interfaces import Query, QueryABC, Record, RecordABC, IndexABC
 from .time import TimeRange
-from .indexes import IndexABC, IndexDispatcher, RecordChunk
+from .indexes import IndexDispatcher, RecordChunk
 

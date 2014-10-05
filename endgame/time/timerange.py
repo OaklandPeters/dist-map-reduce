@@ -1,6 +1,8 @@
 import datetime
 from ..extern.clsproperty import VProperty
 
+__all__ = ['TimeRange']
+
 class TimeRange(object):
     """
     Should have capacity to ask if one timerange is in another.

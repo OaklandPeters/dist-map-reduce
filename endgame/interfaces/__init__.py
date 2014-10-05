@@ -1,15 +1,14 @@
-
+from __future__ import absolute_import
 
 __all__ = [
-    'Query', 'Record'
+    'Query', 'QueryABC',
+    'Record', 'RecordABC',
+    'IndexABC'
 ]
 
-class Query(object):
-    def __init__(self, ips, timerange):
-        self.ips = ips
-        self.timerange = timerange
+from .indexabc import IndexABC
+from .query import Query, QueryABC
+from .record import Record, RecordABC
 
-class Record(object):
-    def __init__(self, ip, timestamp):
-        self.ip = ip
-        self.timestamp = timestamp
+
+
