@@ -3,6 +3,7 @@ Immediate work-plan
 
 [] Next step: IndexDispatcher
 	[] Stub it
+	[] Make a config file builder
 	[] Setup folder worth of files
 		[] modify file creator for random names.
 		[] create sample config file of names
@@ -11,7 +12,15 @@ Immediate work-plan
 			[] multiple files
 	[] 
 		
-
+[] URLDispatcher
+[] Web server - with capability to:
+	[] Receive requests for individual indexes/folders
+	[] Map those folders onto a config file
+		[] Maybe generate the config file for a folder, as needed
+	[] Generate the IndexDispatcher object for the config file
+	[] Pass down to the command the IndexDispatcher
+		
+		
 [] Read problem_statement CAREFULLY
 	[] Make notes
 	[] Step 1: Make data for 100,000 records + timestamp
@@ -33,6 +42,11 @@ Immediate work-plan
 		[] For self, find all records in that time range
 			[] Have to do a smart search shinanagin
 		[] Then filter those results by the IP address list
+	
+
+IMPROVEMENTS:
+[] Replace the file scan with grep (or this would be the sleeping-scan)
+	
 	
 	
 Problem notes:

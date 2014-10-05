@@ -3,6 +3,7 @@ import abc
 import collections
 from ..timerange import TimeRange
 from ..extern.clsproperty import VProperty
+from .record import Record
 
 
 __all__ = ['QueryABC', 'Query']
@@ -16,6 +17,15 @@ class Query(QueryABC):
     def __init__(self, ips, timerange):
         self.ips = ips
         self.timerange = timerange
+    
+    def __contains__(self, other):
+        if isinstance(other, Record):
+            return (
+                (other.timestamp in self.timerange)
+                and (other.ip in self.ips)
+            )
+        else:
+            super(Query, self).__contains__(other)
 
     def __repr__(self):
         return "{name}({ips}, {timerange})".format(

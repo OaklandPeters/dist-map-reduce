@@ -25,7 +25,7 @@ class RecordChunkTests(unittest.TestCase):
         )
     def test_waken(self):
         chunk = RecordChunk(self.filename)
-        chunk.waken()
+        chunk.wake_up()
         self.assertEqual(
             len(chunk.data),
             self.count
@@ -46,7 +46,7 @@ class RecordChunkTests(unittest.TestCase):
         )
     def test_find(self):
         chunk = RecordChunk(self.filename)
-        chunk.waken()
+        chunk.wake_up()
         
         found = chunk.find(self.query)
         self.assert_(Record('210.173.97.67', 1412536793.528) in found)

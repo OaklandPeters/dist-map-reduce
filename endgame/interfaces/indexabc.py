@@ -14,22 +14,17 @@ class IndexABC(object):
     reduce = abc.abstractmethod(lambda *args, **kwargs: NotImplemented)
     
     # Wake/Sleep Interface
-    live = abc.abstractproperty()
+    awake = abc.abstractproperty()
     state = abc.abstractproperty()
-    waken = abc.abstractmethod(lambda *args, **kwargs: NotImplemented)
+    wake_up = abc.abstractmethod(lambda *args, **kwargs: NotImplemented)
     sleep = abc.abstractmethod(lambda *args, **kwargs: NotImplemented)
-    
-    #data = abc.abstractproperty() # list of entries: IndexDispatcher or RecordChunk    
-
+        
+    #==========================================================================
+    #    Mixin Methods
+    #==========================================================================
     def find(self, query):
         """The recursion step. Combines map + reduce
-
-        For now, assume accepts only 1 argument: query
-        Todo: allow to accept either:
-            find(ip_list, timerange)
-                --> query = Query(ip_list, timerange)
-                    return self.find(query)
-            find(query)
+        Single argument should be a Query object.
         """
         # Map
         # found = map(finder(query), self.data)

@@ -15,30 +15,8 @@ class RecordChunk(IndexABC):
     
     def sleep(self):
         self.data = None
-    def waken(self):
+    def wake_up(self):
         self.data = list(self.read())
-    
-
-    def find(self, query):
-        """The recursion step. Combines map + reduce
-
-        For now, assume accepts only 1 argument: query
-        Todo: allow to accept either:
-            find(ip_list, timerange)
-                --> query = Query(ip_list, timerange)
-                    return self.find(query)
-            find(query)
-        """
-        # Map
-        # found = map(finder(query), self.data)
-        found = self.map(query)
-        
-        # Reduce
-        # This step should be changed for RecordChunk indexes 
-        # ... filter
-        reduced = self.reduce(found, query) 
-        
-        return reduced
 
     def read(self):
         with open(self.filepath, 'rb') as infile:
@@ -48,7 +26,7 @@ class RecordChunk(IndexABC):
         
     def map(self, query):
         # Get records
-        self.waken()
+        self.wake_up()
         for record in self.data:
             yield record
         
@@ -57,24 +35,17 @@ class RecordChunk(IndexABC):
         return [
             record
             for record in self.data
-            if record.timestamp in query.timerange
-            and record.ip in query.ips
+            if record in query
+            #if record.timestamp in query.timerange
+            #and record.ip in query.ips
         ]
-        
-#         accumulator = []
-#         for i, record in enumerate(self.data):
-#             if record.ip in query.ips:
-#                 print(record)
-#                 if record.timestamp in query.timerange:
-#                     accumulator += [record]
-
     
     @property
-    def live(self):
+    def awake(self):
         if self.data is None:
             return True
         else:
             return False
     @property
     def state(self):
-        return self.live
+        return self.awake
