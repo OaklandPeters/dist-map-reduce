@@ -5,4 +5,5 @@ __all__ = [
 ]
 
 from .recordchunk import RecordChunk
-from .stubs import IndexDispatcher
+from .indexdispatcher import IndexDispatcher
+#from .stubs import IndexDispatcher

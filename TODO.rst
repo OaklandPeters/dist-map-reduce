@@ -1,5 +1,17 @@
 Immediate work-plan
 -----------------------
+[] test_timerange.py
+	[] Convert timerange from timestamps are int/long --> float
+	[] change name of subpackage 'time' --> timerange
+	
+	
+[] Next step: IndexDispatcher
+	[] Stub it
+	[] Setup folder worth of files
+		[] modify file creator for random names.
+		[] create sample config file of names
+	[] 
+		
 
 [] Read problem_statement CAREFULLY
 	[] Make notes
