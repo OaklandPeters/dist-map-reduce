@@ -6,10 +6,14 @@ __all__ = [
     'convert_records_csv',
     'read_records',
     'IPv4',
-    'TimeStamp'
+    'TimeStamp',
+    'write_record_dir'
 ]
 
 from .make_record import (
     write_records_csv, read_records_csv, convert_records_csv, read_records,
     IPv4, TimeStamp
 )
+
+from .make_dispatcher import (write_record_dir)
+

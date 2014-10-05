@@ -1,10 +1,13 @@
 from __future__ import absolute_import
 import unittest
 import os
+import shutil
 from endgame.deploy import write_records_csv, read_records, convert_records_csv
+from endgame.deploy import write_record_dir
 from endgame.interfaces import Record
 
-class DeployTests(unittest.TestCase):
+
+class DeployRecordsTests(unittest.TestCase):
     def setUp(self):
         self.filename = '1k.csv'
         self.count = 1000
@@ -32,6 +35,32 @@ class DeployTests(unittest.TestCase):
             os.remove(filename)
         write_records_csv(filename, count=count)
         self.assert_(os.path.exists(filename))
+
+class DeployDispatcherTests(unittest.TestCase):
+    def setUp(self):
+        self.dirname = 'stable_dispatcher'
+        self.namestub = 'stable_1k'
+        self.filecount = 5
+        self.recordcount = 1000
         
+        self.expected_names = [
+            'stable_1k_0.csv',
+            'stable_1k_1.csv',
+            'stable_1k_2.csv',
+            'stable_1k_3.csv',
+            'stable_1k_4.csv'
+        ]
+        if os.path.exists(self.dirname):
+            shutil.rmtree(self.dirname)
+    def test_basic(self):
+        self.assert_(not os.path.exists(self.dirname))
+        write_record_dir(self.dirname, self.namestub, 
+            filecount=self.filecount, recordcount=self.recordcount
+        )
+        
+        created = os.listdir(self.dirname) 
+        for name in self.expected_names:
+            self.assert_(name in created)
+
 if __name__ == "__main__":
     unittest.main()

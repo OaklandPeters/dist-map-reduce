@@ -1,14 +1,14 @@
 Immediate work-plan
 -----------------------
 
-[] Try query containing timerange on RecordChunk's map/reduce
-	[] Get deploy working again, with new datetime_to_timestamp
-	
 [] Next step: IndexDispatcher
 	[] Stub it
 	[] Setup folder worth of files
 		[] modify file creator for random names.
 		[] create sample config file of names
+		[] Multiple files to work with
+			[] folder: named per config
+			[] multiple files
 	[] 
 		
 

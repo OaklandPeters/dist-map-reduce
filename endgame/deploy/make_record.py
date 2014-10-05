@@ -1,5 +1,5 @@
-#!/usr/bin/env python 
-import sys
+#!/usr/bin/env python
+from __future__ import absolute_import
 import random
 import datetime
 import csv
@@ -78,7 +78,7 @@ def write_records_csv(filename, count=1000, interval=100.0):
     """
     records = rand_records(count=count, interval=interval)
     with open(filename, 'w') as out:
-        csvwriter = csv.writer(out)
+        csvwriter = csv.writer(out, lineterminator='\n',)
         csvwriter.writerows(records)
 
 def read_records_csv(filename):
