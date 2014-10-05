@@ -9,6 +9,6 @@ __all__ = [
 ]
 
 from .interfaces import Query, QueryABC, Record, RecordABC, IndexABC
-from .time import TimeRange
+from endgame.timerange import TimeRange
 from .indexes import IndexDispatcher, RecordChunk
 

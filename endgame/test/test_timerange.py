@@ -1,8 +1,9 @@
 from __future__ import absolute_import
 import unittest
 import datetime
+import time
 
-from endgame.time import TimeRange, datetime_to_timestamp, timestamp_to_datetime
+from endgame.timerange import TimeRange, datetime_to_timestamp, timestamp_to_datetime
 
 class TimeRangeTests(unittest.TestCase):
     def setUp(self):
@@ -12,8 +13,8 @@ class TimeRangeTests(unittest.TestCase):
         self.delta = datetime.timedelta(seconds=60)
         self.then = self.now + self.delta
         self.then_ts = datetime_to_timestamp(self.then)
-        self.second = 1000
-        self.minute = 60 * self.second
+        self.second = 1.0
+        self.minute = 60.0
         
         self.inside = self.now_ts + self.second * 10
         self.outside = self.now_ts + self.minute * 10
@@ -36,17 +37,9 @@ class TimeRangeTests(unittest.TestCase):
         self.assert_(self.inside in tr)
         self.assert_(self.outside not in tr)
     def test_datetime_to_None(self):
-        import time
-        time.sleep(0.1)
-        # None --> a time AFTER self.now
-        lam = lambda: TimeRange(self.now, None)
-        print()
-        
-        
-        
-        self.assertRaises(ValueError, lambda: TimeRange(self.now, None))
-        #self.assert_(self.inside not in tr)
-        #self.assert_(self.outside not in tr)
+        tr = TimeRange(self.now, None)
+        self.assert_(self.inside not in tr)
+        self.assert_(self.outside not in tr)
     def test_datetime_to_datetime(self):
         tr = TimeRange(self.now, self.then)
         self.assert_(self.inside in tr)
@@ -56,17 +49,17 @@ class TimeRangeTests(unittest.TestCase):
         self.assert_(self.inside in tr)
         self.assert_(self.outside not in tr)
     def test_timestamp_to_None(self):
-        self.assertRaises(ValueError, lambda: TimeRange(self.now_ts, None))
-#         tr = TimeRange(self.now_ts, None)
-#         self.assert_(self.inside not in tr)
-#         self.assert_(self.outside not in tr)
+        tr = TimeRange(self.now_ts, None)
+#         self.assert_(self.inside not in tr) # May or may not be
+        self.assert_(self.outside not in tr) 
+        
     def test_timestamp_to_datetime(self):
         tr = TimeRange(self.now_ts, self.then)
         self.assert_(self.inside in tr)
         self.assert_(self.outside not in tr)
     def test_timestamp_to_timestamp(self):
         tr = TimeRange(self.now_ts, self.then_ts)
-        self.assert_(self.inside not in tr)
+        self.assert_(self.inside in tr)
         self.assert_(self.outside not in tr)
 
     def test_range_contains(self):
@@ -80,12 +73,35 @@ class TimeRangeTests(unittest.TestCase):
         larger = TimeRange(self.now_ts-10, self.then_ts+10)
         self.assert_(smaller in tr)
         self.assert_(larger not in tr)
-    def test_erroring(self):
+    def test_type_error(self):
         self.assertRaises(TypeError, lambda: TimeRange(None, 'stal'))
         self.assertRaises(TypeError, lambda: TimeRange(12.0, 12))
         
-        print()
-        tr = TimeRange(-11000, 1000)
+    def test_value_error(self):
+        time.sleep(0.1)
+        self.assertRaises(ValueError, lambda: TimeRange(None, self.now))
         
+
+class TimeConversionTests(unittest.TestCase):
+    def time_dt_equality(self, dt):
+        reflection = timestamp_to_datetime(datetime_to_timestamp(dt))
+        self.assert_(
+            dt == reflection 
+        )
+    def time_ts_equality(self, ts):
+        reflection = datetime_to_timestamp(timestamp_to_datetime(ts))
+        self.assert_(
+            ts == reflection
+        )
+    def test_datetime(self):
+        dt = datetime.datetime.now()
+        self.time_dt_equality(dt)
+    def test_timestamp(self):
+        ts = 1000000
+        self.time_ts_equality(ts)
+        
+        
+        
+
 if __name__ == "__main__":
     unittest.main()

@@ -3,7 +3,7 @@ Immediate work-plan
 [] test_timerange.py
 	[] Convert timerange from timestamps are int/long --> float
 	[] change name of subpackage 'time' --> timerange
-	
+[] Try query containing timerange on RecordChunk's map/reduce
 	
 [] Next step: IndexDispatcher
 	[] Stub it

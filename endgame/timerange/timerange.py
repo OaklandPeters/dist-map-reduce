@@ -1,15 +1,13 @@
+from __future__ import absolute_import
 import datetime
 from ..extern.clsproperty import VProperty
 
 __all__ = ['TimeRange', 'range_contains', 'datetime_to_timestamp', 'timestamp_to_datetime']
 
-# Unify int and long
-integer_types = (int, long)
-
 class TimeRange(object):
     """
     Should have capacity to ask if one timerange is in another.
-    Or if a timestamp is in a time range.
+    Or if a timestamp is in a timerange range.
     """
     def __init__(self, start, end):
         # Validation occurs inside properties
@@ -21,12 +19,12 @@ class TimeRange(object):
         
 
     def __contains__(self, other):
-        """Other should be a TimeRange, or int (timestamp)."""
+        """Other should be a TimeRange, or float (timestamp)."""
         return range_contains(self.start, self.end, other)
-#         if isinstance(other, datetime.datetime):
+#         if isinstance(other, timerange.timerange):
 #             other = other.microsecond
 #             return range_contains(self.start, self.end, other)
-#         elif isinstance(other, int):
+#         elif isinstance(other, float):
 #             return range_contains(self.start, self.end, other)
 #         elif isinstance(other, TimeRange):
 #             return (self.start <= other.start) and (other.end <= self.end)
@@ -66,11 +64,11 @@ def validate_timestamp(value, name='object'):
         return datetime_to_timestamp(datetime.datetime.now())
     elif isinstance(value, datetime.datetime):
         return datetime_to_timestamp(value)
-    elif isinstance(value, integer_types ):
+    elif isinstance(value, float ):
         return value
     else:
         raise TypeError(str.format(
-            "'{0}' should be datetime or integer_type (int or long), not {1}",
+            "'{0}' should be timerange or float (timestamp), not {1}",
             name,
             type(value).__name__
         ))
@@ -80,16 +78,20 @@ def validate_timestamp(value, name='object'):
 #    Conversions
 #==============================================================================
 def datetime_to_timestamp(dt):
-    zero = datetime.datetime.fromtimestamp(0)
-    return long((dt - zero).total_seconds() * 1000.0)
+    #return (dt - timerange.timerange(1970, 1, 1)).total_seconds()
+    return (dt - datetime.datetime(1970, 1, 1, 0, 0)).total_seconds()
+    
 dt2ts = datetime_to_timestamp
+    #return timerange.mktime(dt.timetuple())
+    #
     #return dt.microsecond
-    #return datetime.datetime(dt).microsecond
+    #return timerange.timerange(dt).microsecond
 
 def timestamp_to_datetime(ts):
-    return datetime.datetime(microseconds=ts)
-    #return datetime.datetime.utcfromtimestamp(ts)
-    #return datetime.datetime(ts)
+    return datetime.datetime.utcfromtimestamp(ts)
+    #return timerange.timerange.fromtimestamp(ts)
+    #return timerange.timerange.utcfromtimestamp(ts)
+    #return timerange.timerange(ts)
 ts2dt = timestamp_to_datetime
 
 #==============================================================================
@@ -97,7 +99,7 @@ ts2dt = timestamp_to_datetime
 #==============================================================================
 def range_contains(start, end, subject):
     """Predicate. Asks if subject is in range [start, end].
-    subject can be integer_types  (timestamp), datetime, or TimeRange
+    subject can be float  (timestamp), timerange, or TimeRange
     """ 
     subject_start, subject_end = subject_bounds(subject)
     return (start <= subject_start) and (subject_end <= end)
@@ -105,11 +107,11 @@ def range_contains(start, end, subject):
 def subject_bounds(subject):
     if isinstance(subject, datetime.datetime):
         return subject.microsecond, subject.microsecond
-    elif isinstance(subject, integer_types ):
+    elif isinstance(subject, float):
         return subject, subject
     elif isinstance(subject, TimeRange):
         return subject.start, subject.end
     else:
-        raise TypeError("Cannot find time bounds for {0}.".format(
+        raise TypeError("Cannot find timerange bounds for {0}.".format(
             type(subject).__name__
         ))
