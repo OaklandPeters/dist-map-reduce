@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import csv
+from ..extern.unroll import unroll #multiline comprehensions
 from ..interfaces import IndexABC, Record
 
 
@@ -23,29 +24,38 @@ class RecordChunk(IndexABC):
             csvreader = csv.reader(infile)
             for row in csvreader:
                 yield Record(row[0], row[1])
-        
+
+#     def find(self, query):
+#         found = self.map(query)
+#         reduced = self.reduce(found, query) 
+#         return reduced
+    
     def map(self, query):
+        return list(self.imap(query))
+    def imap(self, query):
         # Get records
         self.wake_up()
         for record in self.data:
             yield record
-        
     def reduce(self, records, query):
+        return list(self.ireduce(records, query))
+    def ireduce(self, records, query):
         # Filter by the query
-        return [
-            record
-            for record in self.data
-            if record in query
-            #if record.timestamp in query.timerange
-            #and record.ip in query.ips
-        ]
+        for record in self.data:
+            if record in query:
+                yield record
+#         return [
+#             record
+#             for record in self.data
+#             if record in query
+#         ]
     
     @property
     def awake(self):
         if self.data is None:
-            return True
-        else:
             return False
+        else:
+            return True
     @property
     def state(self):
         return self.awake

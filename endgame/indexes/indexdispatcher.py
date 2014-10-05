@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import os
 import json
+import itertools
 from ..interfaces import IndexABC
 from .recordchunk import RecordChunk
 from .urldispatcher import URLDispatcher
@@ -12,9 +13,10 @@ class IndexDispatcher(IndexABC):
     def __init__(self, filepath):
         # Config file, or directory
         if os.path.isdir(filepath):
-            filepath = directory_to_config(filepath)
+            filepath = self.write(filepath)
         self.filepath = filepath
         self.data = None # 'sleeping'
+        
     def map(self, query):
         self.wake_up()
         return [
@@ -23,16 +25,21 @@ class IndexDispatcher(IndexABC):
         ]
     def reduce(self, records, query):
         """Does this need to do an filtering?"""
-        return sorted(records, key=lambda record: record.timestamp)
+        print(records)
+        print(query)
+        # Remove empty, and un-nest records
+        flattened = flatten(records)
+        processed = sorted(flattened, key=lambda record: record.timestamp)
+        return processed
 
     
     # Wake/Sleep Interface
     @property
     def awake(self):
         if self.data is None:
-            return True
-        else:
             return False
+        else:
+            return True
     @property
     def state(self):
         return self.awake
@@ -50,15 +57,12 @@ class IndexDispatcher(IndexABC):
             name = type(self).__name__,
             data = repr(self.data)
         )
-    #---------------- Unfinished
     def wake_iter(self):
         """
         Expand this, so that it creates the wrapper objects for each.
+        Assumes each element from self.read() is a basestring.
         """
         for elm in self.read():
-            
-            # Assumes elm should be basestring
-            
             if is_RecordChunk(elm):
                 yield RecordChunk(elm)
             elif is_Dispatcher(elm):
@@ -67,17 +71,14 @@ class IndexDispatcher(IndexABC):
                 yield URLDispatcher(elm)
             else:
                 raise TypeError("Unrecognized element type.")
-            
-        self.data = list(self.read())
 
     def read(self):
         with open(self.filepath, 'r') as config_file:
             config = json.load(config_file)
         return iter(config['data'])
 
-    def write(self):
-        # ? Do I even need this ?
-        pass
+    def write(self, dirpath):
+        return directory_to_config(dirpath)
 
 
 
@@ -131,3 +132,10 @@ def is_URL(value):
         return True
     return False
 
+
+#------------------------------------------------------------------------------
+#    Local Utility Functions
+#------------------------------------------------------------------------------
+def flatten(seq_of_seq):
+    "Flatten one level of nesting"
+    return itertools.chain.from_iterable(seq_of_seq)
