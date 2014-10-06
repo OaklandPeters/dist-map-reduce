@@ -7,6 +7,10 @@ from endgame.interfaces import Query, Record
 
 
 class IndexDispatcherTests(unittest.TestCase):
+    """
+    Note that the target_record naturally occurs in stable_1k_2.csv
+    I have also injected it into the end of stable_1k_0.csv
+    """
     def setUp(self):
         self.dirpath = 'stable_dispatcher'
         self.config_path = 'stable_dispatcher.json'
@@ -40,12 +44,16 @@ class IndexDispatcherTests(unittest.TestCase):
         self.assertEqual(len(disp.data), 5)
         self.assert_(isinstance(disp.data[0], RecordChunk))
 
-#     def test_map(self):
-#         pass
-    
     def test_find(self):
         dispatcher = IndexDispatcher(self.dirpath)
         results = dispatcher.find(self.query)
+        expected = [
+            Record('34.53.12.162', 1412534621.529),
+            Record('34.53.12.162', 1412534621.53)
+        ]
+        self.assert_(expected[0] in results)
+        self.assert_(expected[1] in results)
+        
         print()
 
 if __name__ == "__main__":

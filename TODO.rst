@@ -1,26 +1,19 @@
 Immediate work-plan
 -----------------------
 
-[] Next step: IndexDispatcher
-	[] Stub it
-	[] Write test_indexdispatcher.py
-	[] Make a config file builder
-	
-	[] Setup folder worth of files
-		[] modify file creator for random names.
-		[] create sample config file of names
-		[] Multiple files to work with
-			[] folder: named per config
-			[] multiple files
-	[] 
-		
-[] URLDispatcher
-[] Web server - with capability to:
+[] Setup flask
+	[] Need automatic creation of a little directory
+	[] Which provides REST access:
+		[] Query (url query) --> maps across directories --> returns results
 	[] Receive requests for individual indexes/folders
 	[] Map those folders onto a config file
 		[] Maybe generate the config file for a folder, as needed
 	[] Generate the IndexDispatcher object for the config file
 	[] Pass down to the command the IndexDispatcher
+		
+		
+[] URLDispatcher
+[] Web server - with capability to:
 		
 		
 [] Read problem_statement CAREFULLY
