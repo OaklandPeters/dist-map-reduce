@@ -1,10 +1,15 @@
 from __future__ import absolute_import
 from ..interfaces import IndexABC
 
-class URLDispatcher(object):
+
+class URLDispatcher(IndexABC):
     """
     Interacts with a remote URL (which is expected to in turn be an IndexDispatcher).
     """
+    def __init__(self, filepath):
+        self.confpath = self._validate_confpath(filepath)
+    
+    
     #--------------------------------------------------------------------------
     #    Dispatching
     #--------------------------------------------------------------------------
@@ -31,3 +36,6 @@ class URLDispatcher(object):
     @classmethod
     def valid(cls, value):
         return cls.valid_url(value)
+
+    
+

@@ -1,11 +1,16 @@
 Immediate work-plan
 -----------------------
+[] validators.py
+	[] Refactor from IndexDispatcher
+	[] Refactor from RecordChunk
+	[] Refactor from URLDispatcher
+	[] Add to __init__.py
+[] Fix up classifier
+	[] Inside validators.py
+	[] import to IndexDispatcher
 
-[] Refactor file name read/write: recordchunk
-	[] System agnostic method:
 
-
-[] refactor: dispatching on string: remove from IndexDispatcher
+[] Stub: URLDispatcher: similar to IndexDispatcher
 
 [] Setup flask
 	[] Need automatic creation of a little directory

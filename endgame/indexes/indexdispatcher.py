@@ -4,14 +4,14 @@ import json
 import itertools
 import collections
 from ..interfaces import IndexABC
-from .recordchunk import RecordChunk
-from .urldispatcher import URLDispatcher
+#from .recordchunk import RecordChunk
+#from .urldispatcher import URLDispatcher
+from .shared import dirpath_to_confpath, confpath_to_dirpath, directory_to_config
+from .classify import classify_index
 
-__all__ = ['IndexDispatcher', 'directory_to_config']
 
+__all__ = ['IndexDispatcher']
 
-def is_nonstringsequence(value):
-    return isinstance(value, collections.Sequence) and not isinstance(value, basestring)
 
 class IndexDispatcher(IndexABC):
     """Dispatches to other indexes or record-chunks."""
@@ -46,6 +46,11 @@ class IndexDispatcher(IndexABC):
         """Create configuration file, based on a directory."""
         return directory_to_config(dirpath)
         
+    
+
+    #--------------------------------------------------------------------------
+    #    Dispatching
+    #--------------------------------------------------------------------------
     dispatcher_extensions = ['.json', '.config']
     @classmethod
     def _validate_confpath(cls, filepath):
@@ -69,10 +74,6 @@ class IndexDispatcher(IndexABC):
                 "'filepath' of type '{0}' is neither a config or directory: {1}",
                 type(filepath).__name__, filepath
             ))
-
-    #--------------------------------------------------------------------------
-    #    Dispatching
-    #--------------------------------------------------------------------------
     @classmethod
     def valid_confpath(cls, filepath):
         try:
@@ -124,15 +125,7 @@ class IndexDispatcher(IndexABC):
         for elm in self.read():
             index = classify_index(elm) # Find index type
             yield index(elm) # Instantiate and return type
-            
-#             if RecordChunk.valid(elm):
-#                 yield RecordChunk(elm)
-#             elif IndexDispatcher.valid(elm):
-#                 yield IndexDispatcher(elm)
-#             elif URLDispatcher.valid(elm):
-#                 yield URLDispatcher(elm)
-#             else:
-#                 raise TypeError("Unrecognized element type.")
+
 
     #--------------------------------------------------------------------------
     #    Magic Methods
@@ -162,90 +155,26 @@ class IndexDispatcher(IndexABC):
 #------------------------------------------------------------------------------
 #    Local Utility Functions
 #------------------------------------------------------------------------------
-def dirpath_to_confpath(dirpath):
-    if dirpath[-1] == os.sep:
-        confpath = dirpath[:-1] + ".json"
-    else:
-        confpath = dirpath + ".json"
-    return confpath
+def is_nonstringsequence(value):
+    return isinstance(value, collections.Sequence) and not isinstance(value, basestring)
 
-def confpath_to_dirpath(confpath):
-    cname, _ = os.path.splitext(confpath)
-    return cname
-
-def directory_to_config(dirpath):
-    """Create a configuration file for dirpath, and return it's filepath.
-    Place the configuration file on level with the directory. IE:
-    parent/
-        {dirpath}/
-        {dirpath}.json
-        
-    """
-    if not os.path.isdir(dirpath):
-        raise ValueError("{0} is not an existing directory.".format(dirpath))
-    # Write config_path: remove trailing seperator
-    confpath = dirpath_to_confpath(dirpath)
-    #Get all csv files
-    record_files = [
-        pathsequence(os.path.join(dirpath, filepath))
-        for filepath in os.listdir(dirpath)
-        if filepath.endswith('.csv')
-    ]
-    # Write JSON config file
-    with open(confpath, 'w') as config_file:
-        json.dump({'data': record_files}, config_file)
-    return confpath
-
-def pathsequence(fullpath):
-    return fullpath.split(os.sep)
-    
-
-#------------------------------------------------------------------------------
-#    Local Utility Functions
-#------------------------------------------------------------------------------
 def flatten(seq_of_seq):
     "Flatten one level of nesting"
     return itertools.chain.from_iterable(seq_of_seq)
 
 
-#------------------------------------------------------------------------------
-#    Classifiers
-#------------------------------------------------------------------------------
-def classify_index(instring):
-    """classify_index(basestring: instring) --> IndexABC subclass
-
-    Based on instring, return a appropriate IndexABC subclass - one
-    descendant of IndexABC (RecordChunk or IndexDispatcher or URLDispatcher).
-    'instring' is usually read from IndexDispatcher's config file
-    """
-    if RecordChunk.valid(instring):
-        return RecordChunk
-    elif IndexDispatcher.valid(instring):
-        return IndexDispatcher
-    elif URLDispatcher.valid(instring):
-        return URLDispatcher
-    else:
-        raise TypeError("Unrecognized index type for "+str(instring))
-# chunk_extensions = ['.csv']
-# def is_RecordChunk(value):
-#     return RecordChunk.valid(value)
-# #     if os.path.exists(value) and os.path.isfile(value):
-# #         _, ext = os.path.splitext(value)
-# #         if ext in chunk_extensions:
-# #             return True
-# #     return False
-# dispatcher_extensions = ['.json', '.config']
-# def is_Dispatcher(value):
-#     return IndexDispatcher.valid(value)
-# #     if os.path.exists(value) and os.path.isfile(value):
-# #         _, ext = os.path.splitext(value)
-# #         if ext in dispatcher_extensions:
-# #             return True
-# #     return False
-# def is_URL(value):
-#     return URLDispatcher.valid(value)
-# #     if value.startswith("http://"):
-# #         return True
-# #     return False
-
-
+# def classify_index(instring):
+#     """classify_index(basestring: instring) --> IndexABC subclass
+# 
+#     Based on instring, return a appropriate IndexABC subclass - one
+#     descendant of IndexABC (RecordChunk or IndexDispatcher or URLDispatcher).
+#     'instring' is usually read from IndexDispatcher's config file
+#     """
+#     if RecordChunk.valid(instring):
+#         return RecordChunk
+#     elif IndexDispatcher.valid(instring):
+#         return IndexDispatcher
+#     elif URLDispatcher.valid(instring):
+#         return URLDispatcher
+#     else:
+#         raise TypeError("Unrecognized index type for "+str(instring))

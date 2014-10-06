@@ -4,7 +4,6 @@ import os
 #from ..extern.unroll import unroll #multiline comprehensions
 from ..interfaces import IndexABC, Record
 
-
 class RecordChunk(IndexABC):
     """Corresponds to a single log file.
     Considered to be live when data != None
