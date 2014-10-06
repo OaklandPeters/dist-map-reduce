@@ -14,14 +14,12 @@ class RecordChunkTests(unittest.TestCase):
         os.chdir(testdir)
         self.filename = 'stable_1k.csv'
         self.count = 1000
-        self.file_time_range = [1412525393.52, 1412625293.615]
-        self.target_entry = ('210.173.97.67', 1412536793.528)
+        #stable_1k_2.csv, row #50
+        self.target_entry = ('34.53.12.162', 1412534621.53)
         self.target_record = Record(*self.target_entry)
-        #entry #114, line # 229
-        # ('21.188.253.146', 1412536693.528)
         self.query = Query(
-            '210.173.97.67',
-            (1412536793.527, 1412536793.531)
+            '34.53.12.162',
+            (1412534621.529, 1412534621.531)
         )
     def test_waken(self):
         chunk = RecordChunk(self.filename)
@@ -49,8 +47,8 @@ class RecordChunkTests(unittest.TestCase):
         chunk.wake_up()
         
         found = chunk.find(self.query)
-        self.assert_(Record('210.173.97.67', 1412536793.528) in found)
         self.assert_(self.target_record in found)
+        
         
         
 

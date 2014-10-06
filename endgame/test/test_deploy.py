@@ -38,17 +38,17 @@ class DeployRecordsTests(unittest.TestCase):
 
 class DeployDispatcherTests(unittest.TestCase):
     def setUp(self):
-        self.dirname = 'stable_dispatcher'
-        self.namestub = 'stable_1k'
+        self.dirname = 'test_dispatcher'
+        self.namestub = 'test_1k'
         self.filecount = 5
         self.recordcount = 1000
         
         self.expected_names = [
-            'stable_1k_0.csv',
-            'stable_1k_1.csv',
-            'stable_1k_2.csv',
-            'stable_1k_3.csv',
-            'stable_1k_4.csv'
+            'test_1k_0.csv',
+            'test_1k_1.csv',
+            'test_1k_2.csv',
+            'test_1k_3.csv',
+            'test_1k_4.csv'
         ]
         if os.path.exists(self.dirname):
             shutil.rmtree(self.dirname)

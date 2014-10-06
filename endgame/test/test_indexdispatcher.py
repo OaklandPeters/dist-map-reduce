@@ -53,8 +53,7 @@ class IndexDispatcherTests(unittest.TestCase):
         ]
         self.assert_(expected[0] in results)
         self.assert_(expected[1] in results)
-        
-        print()
+
 
 if __name__ == "__main__":
     unittest.main()
