@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import csv
-from ..extern.unroll import unroll #multiline comprehensions
+import os
+#from ..extern.unroll import unroll #multiline comprehensions
 from ..interfaces import IndexABC, Record
 
 
@@ -44,11 +45,6 @@ class RecordChunk(IndexABC):
         for record in self.data:
             if record in query:
                 yield record
-#         return [
-#             record
-#             for record in self.data
-#             if record in query
-#         ]
     
     @property
     def awake(self):
@@ -69,3 +65,19 @@ class RecordChunk(IndexABC):
             name = type(self).__name__,
             data = repr(self.data)
         )
+    
+    #--------------------------------------------------------------------------
+    #    Dispatching
+    #--------------------------------------------------------------------------
+    chunk_extensions = ['.csv']
+    @classmethod
+    def valid(cls, value):
+        return cls.valid_recordpath(value)
+    @classmethod
+    def valid_recordpath(cls, filepath):
+        """Identifies valid record source files."""
+        if os.path.exists(filepath) and os.path.isfile(filepath):
+            fname, fext = os.path.splitext(filepath)
+            if fext in cls.chunk_extensions:
+                return True
+        return False

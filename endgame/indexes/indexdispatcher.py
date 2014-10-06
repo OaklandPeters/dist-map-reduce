@@ -22,7 +22,6 @@ class IndexDispatcher(IndexABC):
     #--------------------------------------------------------------------------
     #    File Interaction
     #--------------------------------------------------------------------------
-    dispatcher_extensions = ['.json', '.config']
     def read(self):
         """Read configuration file, and return iterator over it's data."""
         with open(self.confpath, 'r') as config_file:
@@ -32,7 +31,7 @@ class IndexDispatcher(IndexABC):
     def write(cls, dirpath):
         """Create configuration file, based on a directory."""
         return directory_to_config(dirpath)
-    
+    dispatcher_extensions = ['.json', '.config']
     @classmethod
     def _validate_confpath(cls, filepath):
         """filepath: path of directory, or path of config file
@@ -55,6 +54,10 @@ class IndexDispatcher(IndexABC):
                 "'filepath' of type '{0}' is neither a config or directory: {1}",
                 type(filepath).__name__, filepath
             ))
+
+    #--------------------------------------------------------------------------
+    #    Dispatching
+    #--------------------------------------------------------------------------
     @classmethod
     def valid_confpath(cls, filepath):
         try:
@@ -63,7 +66,9 @@ class IndexDispatcher(IndexABC):
             return False
         else:
             return True
-    
+    @classmethod
+    def valid(cls, filepath):
+        return cls.valid_confpath(filepath)
 
     
     #--------------------------------------------------------------------------
@@ -102,14 +107,23 @@ class IndexDispatcher(IndexABC):
         Assumes each element from self.read() is a basestring.
         """
         for elm in self.read():
-            if is_RecordChunk(elm):
+            if RecordChunk.valid(elm):
                 yield RecordChunk(elm)
-            elif is_Dispatcher(elm):
+            elif IndexDispatcher.valid(elm):
                 yield IndexDispatcher(elm)
-            elif is_URL(elm):
+            elif URLDispatcher.valid(elm):
                 yield URLDispatcher(elm)
             else:
                 raise TypeError("Unrecognized element type.")
+
+#             if is_RecordChunk(elm):
+#                 
+#             elif is_Dispatcher(elm):
+#                 yield IndexDispatcher(elm)
+#             elif is_URL(elm):
+#                 yield URLDispatcher(elm)
+#             else:
+#                 raise TypeError("Unrecognized element type.")
 
 
     #--------------------------------------------------------------------------
@@ -132,6 +146,13 @@ class IndexDispatcher(IndexABC):
         )
 
 
+
+
+
+
+#------------------------------------------------------------------------------
+#    Local Utility Functions
+#------------------------------------------------------------------------------
 def dirpath_to_confpath(dirpath):
     if dirpath[-1] == os.sep:
         confpath = dirpath[:-1] + ".json"
@@ -173,24 +194,25 @@ def directory_to_config(dirpath):
 #------------------------------------------------------------------------------
 chunk_extensions = ['.csv']
 def is_RecordChunk(value):
-    if os.path.exists(value) and os.path.isfile(value):
-        _, ext = os.path.splitext(value)
-        if ext in chunk_extensions:
-            return True
-    return False
+    return RecordChunk.valid(value)
+#     if os.path.exists(value) and os.path.isfile(value):
+#         _, ext = os.path.splitext(value)
+#         if ext in chunk_extensions:
+#             return True
+#     return False
 dispatcher_extensions = ['.json', '.config']
 def is_Dispatcher(value):
-    return IndexDispatcher.valid_filepath(value)
+    return IndexDispatcher.valid(value)
 #     if os.path.exists(value) and os.path.isfile(value):
 #         _, ext = os.path.splitext(value)
 #         if ext in dispatcher_extensions:
 #             return True
 #     return False
 def is_URL(value):
-    if value.startswith("http://"):
-        return True
-    return False
-
+    return URLDispatcher.valid(value)
+#     if value.startswith("http://"):
+#         return True
+#     return False
 
 #------------------------------------------------------------------------------
 #    Local Utility Functions

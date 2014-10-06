@@ -18,7 +18,11 @@ class IndexABC(object):
     state = abc.abstractproperty()
     wake_up = abc.abstractmethod(lambda *args, **kwargs: NotImplemented)
     sleep = abc.abstractmethod(lambda *args, **kwargs: NotImplemented)
-        
+    
+    # Identifies valid input for constructor
+    #     Used to 'dispatch' to the appropriate type:
+    #        IndexDispatcher, RecordChunk, or URLDispatcher
+    valid = abc.abstractmethod(lambda *args, **kwargs: NotImplemented)
     #==========================================================================
     #    Mixin Methods
     #==========================================================================

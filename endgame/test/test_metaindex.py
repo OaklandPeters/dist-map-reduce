@@ -20,17 +20,23 @@ class MetaIndexTests(unittest.TestCase):
     def test_open(self):
         meta = IndexDispatcher(self.meta_path)
         self.assert_(isinstance(meta, IndexDispatcher))
+        self.assert_(not meta.awake)
         meta.wake_up()
-        
-        print()
-        print()
-        
+        self.assert_(meta.awake)
+        self.assertEqual(len(meta.data), 2)
+        for elm in meta.data:
+            self.assert_(isinstance(elm, IndexDispatcher))
+            self.assert_(not elm.awake)
+         
     def test_find(self):
         meta = IndexDispatcher(self.meta_path)
         meta.wake_up()
         results = meta.find(self.query)
-        print(len(results))
-        print()
+        
+        self.assertGreaterEqual(len(results), 3)
+        for record in results:
+            self.assert_(record in self.query)
+
 
 if __name__ == "__main__":
     unittest.main()
