@@ -107,6 +107,12 @@ class IndexDispatcher(IndexABC):
         Assumes each element from self.read() is a basestring.
         """
         for elm in self.read():
+            
+            index = classify_index(elm) # Find index type
+            # yield index(elm) # Construct type
+            print(index)
+            print()
+            
             if RecordChunk.valid(elm):
                 yield RecordChunk(elm)
             elif IndexDispatcher.valid(elm):
@@ -150,6 +156,7 @@ class IndexDispatcher(IndexABC):
 
 
 
+
 #------------------------------------------------------------------------------
 #    Local Utility Functions
 #------------------------------------------------------------------------------
@@ -186,33 +193,6 @@ def directory_to_config(dirpath):
         json.dump({'data': record_files}, config_file)
     return confpath
     
-    
-
-
-#------------------------------------------------------------------------------
-#    Classifiers
-#------------------------------------------------------------------------------
-chunk_extensions = ['.csv']
-def is_RecordChunk(value):
-    return RecordChunk.valid(value)
-#     if os.path.exists(value) and os.path.isfile(value):
-#         _, ext = os.path.splitext(value)
-#         if ext in chunk_extensions:
-#             return True
-#     return False
-dispatcher_extensions = ['.json', '.config']
-def is_Dispatcher(value):
-    return IndexDispatcher.valid(value)
-#     if os.path.exists(value) and os.path.isfile(value):
-#         _, ext = os.path.splitext(value)
-#         if ext in dispatcher_extensions:
-#             return True
-#     return False
-def is_URL(value):
-    return URLDispatcher.valid(value)
-#     if value.startswith("http://"):
-#         return True
-#     return False
 
 #------------------------------------------------------------------------------
 #    Local Utility Functions
@@ -220,3 +200,47 @@ def is_URL(value):
 def flatten(seq_of_seq):
     "Flatten one level of nesting"
     return itertools.chain.from_iterable(seq_of_seq)
+
+
+#------------------------------------------------------------------------------
+#    Classifiers
+#------------------------------------------------------------------------------
+index_types = [RecordChunk, IndexDispatcher, URLDispatcher]
+def classify_index(instring):
+    """classify_index(basestring: instring) --> IndexABC subclass
+
+    Based on instring, return a appropriate IndexABC subclass - one
+    descendant of IndexABC (RecordChunk or IndexDispatcher or URLDispatcher).
+    'instring' is usually read from IndexDispatcher's config file    
+    """
+    if RecordChunk.valid(instring):
+        return RecordChunk
+    elif IndexDispatcher.valid(instring):
+        return IndexDispatcher
+    elif URLDispatcher.valid(instring):
+        return URLDispatcher
+    else:
+        raise TypeError("Unrecognized index type for "+str(instring))
+# chunk_extensions = ['.csv']
+# def is_RecordChunk(value):
+#     return RecordChunk.valid(value)
+# #     if os.path.exists(value) and os.path.isfile(value):
+# #         _, ext = os.path.splitext(value)
+# #         if ext in chunk_extensions:
+# #             return True
+# #     return False
+# dispatcher_extensions = ['.json', '.config']
+# def is_Dispatcher(value):
+#     return IndexDispatcher.valid(value)
+# #     if os.path.exists(value) and os.path.isfile(value):
+# #         _, ext = os.path.splitext(value)
+# #         if ext in dispatcher_extensions:
+# #             return True
+# #     return False
+# def is_URL(value):
+#     return URLDispatcher.valid(value)
+# #     if value.startswith("http://"):
+# #         return True
+# #     return False
+
+
