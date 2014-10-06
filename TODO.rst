@@ -37,15 +37,19 @@ Immediate work-plan
 		
 
 
-
+---- IMPROVEMENTS:
 [] TIMETEST! 
 [] Time + space estimation!
 [] Writeup 'Future Directions' improvements:
+	[] binary-search in RecordChunk (see bisect library: http://rosettacode.org/wiki/Binary_search#Python)
+	[] multiprocessing: Have IndexDispatcher make use of multiprocessing for the map step
 	[] Recording time-range in each file (inside config)
 		[] allow pre-empting the scan for most files
 	[] ctypes
 	[] 'sleep_scan' via grep
 
+	
+	
 [] Need to write about assumption: files are written to *in-order*
 	[] either logs are written that way, or server collects access logs
 		... order them, and writes them to a file

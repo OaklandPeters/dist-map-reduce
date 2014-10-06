@@ -19,7 +19,10 @@ class TimeRange(object):
         
 
     def __contains__(self, other):
-        """Other should be a TimeRange, or float (timestamp)."""
+        """Other should be a TimeRange, or float (timestamp).
+        If 'other' is a TimeRange, is it wholly contained inside
+        of [self.start, self.end]?
+        """
         return range_contains(self.start, self.end, other)
 #         if isinstance(other, timerange.timerange):
 #             other = other.microsecond
@@ -31,6 +34,18 @@ class TimeRange(object):
 #         else:
 #             raise TypeError("Cannot ask if TimeRange contains {0}".format(
 #                 type(other).__name__))
+
+    def overlaps(self, other):
+        if isinstance(other, TimeRange):
+            #If either end point is contained within [self.start, self.end]
+            if (self.start <= other.start <= self.end):
+                return True
+            elif (self.start <= other.end <= self.end):
+                return True
+            else:
+                return False
+        else:
+            return other in self #defer to normal containment rules
         
     @VProperty
     class start(object):
@@ -80,7 +95,7 @@ def validate_timestamp(value, name='object'):
 def get_total_seconds(delta):
     """Polyfill for 'delta.total_seconds' from Python 2.7"""
     if hasattr(delta, 'total_seconds'):
-        return delta.total_seconds
+        return delta.total_seconds()
     else:
         return (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 1e6) / 1e6
 
@@ -88,19 +103,9 @@ def datetime_to_timestamp(dt):
     #return (dt - timerange.timerange(1970, 1, 1)).total_seconds()
     #return (dt - datetime.datetime(1970, 1, 1, 0, 0)).total_seconds()
     return get_total_seconds(dt - datetime.datetime(1970, 1, 1, 0, 0))
-    
-dt2ts = datetime_to_timestamp
-    #return timerange.mktime(dt.timetuple())
-    #
-    #return dt.microsecond
-    #return timerange.timerange(dt).microsecond
 
 def timestamp_to_datetime(ts):
     return datetime.datetime.utcfromtimestamp(ts)
-    #return timerange.timerange.fromtimestamp(ts)
-    #return timerange.timerange.utcfromtimestamp(ts)
-    #return timerange.timerange(ts)
-ts2dt = timestamp_to_datetime
 
 #==============================================================================
 #    Time Range Inclusion
@@ -114,7 +119,8 @@ def range_contains(start, end, subject):
 
 def subject_bounds(subject):
     if isinstance(subject, datetime.datetime):
-        return subject.microsecond, subject.microsecond
+        #return subject.microsecond, subject.microsecond
+        return get_total_seconds(subject), get_total_seconds(subject)
     elif isinstance(subject, float):
         return subject, subject
     elif isinstance(subject, TimeRange):
