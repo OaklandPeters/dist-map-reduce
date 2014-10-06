@@ -11,12 +11,64 @@ __all__ = ['IndexDispatcher', 'directory_to_config']
 class IndexDispatcher(IndexABC):
     """Dispatches to other indexes or record-chunks."""
     def __init__(self, filepath):
-        # Config file, or directory
-        if os.path.isdir(filepath):
-            filepath = self.write(filepath)
-        self.filepath = filepath
+        self.confpath = self._validate_confpath(filepath)
+        self.dirpath = confpath_to_dirpath(self.confpath)
+        if not os.path.exists(self.confpath):
+            self.write(self.dirpath)
         self.data = None # 'sleeping'
-        
+    
+    
+    
+    #--------------------------------------------------------------------------
+    #    File Interaction
+    #--------------------------------------------------------------------------
+    dispatcher_extensions = ['.json', '.config']
+    def read(self):
+        """Read configuration file, and return iterator over it's data."""
+        with open(self.confpath, 'r') as config_file:
+            config = json.load(config_file)
+        return iter(config['data'])
+    @classmethod
+    def write(cls, dirpath):
+        """Create configuration file, based on a directory."""
+        return directory_to_config(dirpath)
+    
+    @classmethod
+    def _validate_confpath(cls, filepath):
+        """filepath: path of directory, or path of config file
+        returns path of config file
+        """
+        if os.path.isdir(filepath): #if directory
+            return dirpath_to_confpath(filepath)
+        elif os.path.isfile(filepath): #is file
+            #is it config file?
+            fname, fext = os.path.splitext(filepath)
+            if fext in cls.dispatcher_extensions:
+                return filepath
+            else:
+                raise ValueError(str.format(
+                    "Invalid 'filepath' extension '{0}'. Should be '{1}'",
+                    fext, ", ".join(cls.dispatcher_extensions)
+                ))
+        else:
+            raise ValueError(str.format(
+                "'filepath' of type '{0}' is neither a config or directory: {1}",
+                type(filepath).__name__, filepath
+            ))
+    @classmethod
+    def valid_confpath(cls, filepath):
+        try:
+            cls._validate_confpath(filepath)
+        except (ValueError):
+            return False
+        else:
+            return True
+    
+
+    
+    #--------------------------------------------------------------------------
+    #    Map/Reduce
+    #--------------------------------------------------------------------------
     def map(self, query):
         self.wake_up()
         return [
@@ -24,15 +76,11 @@ class IndexDispatcher(IndexABC):
             for elm in self.data
         ]
     def reduce(self, records, query):
-        """Does this need to do an filtering?"""
-        print(records)
-        print(query)
-        # Remove empty, and un-nest records
+        """Flatten one-level of nesting, removing empty sequences, and then
+        return records sorted by timestamp."""
         flattened = flatten(records)
         processed = sorted(flattened, key=lambda record: record.timestamp)
         return processed
-
-    
     # Wake/Sleep Interface
     @property
     def awake(self):
@@ -47,16 +95,7 @@ class IndexDispatcher(IndexABC):
         self.data = None
     def wake_up(self):
         self.data = list(self.wake_iter())
-    def __str__(self):
-        return "{name}({data})".format(
-            name = type(self).__name__,
-            data = str(self.data)
-        )
-    def __repr__(self):
-        return "{name}({data})".format(
-            name = type(self).__name__,
-            data = repr(self.data)
-        )
+
     def wake_iter(self):
         """
         Expand this, so that it creates the wrapper objects for each.
@@ -72,15 +111,37 @@ class IndexDispatcher(IndexABC):
             else:
                 raise TypeError("Unrecognized element type.")
 
-    def read(self):
-        with open(self.filepath, 'r') as config_file:
-            config = json.load(config_file)
-        return iter(config['data'])
 
-    def write(self, dirpath):
-        return directory_to_config(dirpath)
+    #--------------------------------------------------------------------------
+    #    Magic Methods
+    #--------------------------------------------------------------------------
+    # ? Provide __iter__ - and connect to wake_up?
+#     def __iter__(self):
+#         if not self.awake:
+#             self.wake_up()
+#         return iter(self.data)
+    def __str__(self):
+        return "{name}({data})".format(
+            name = type(self).__name__,
+            data = str(self.data)
+        )
+    def __repr__(self):
+        return "{name}({data})".format(
+            name = type(self).__name__,
+            data = repr(self.data)
+        )
 
 
+def dirpath_to_confpath(dirpath):
+    if dirpath[-1] == os.sep:
+        confpath = dirpath[:-1] + ".json"
+    else:
+        confpath = dirpath + ".json"
+    return confpath
+
+def confpath_to_dirpath(confpath):
+    cname, cext = os.path.splitext(confpath)
+    return cname
 
 def directory_to_config(dirpath):
     """Create a configuration file for dirpath, and return it's filepath.
@@ -93,19 +154,16 @@ def directory_to_config(dirpath):
     if not os.path.isdir(dirpath):
         raise ValueError("{0} is not an existing directory.".format(dirpath))
     # Write config_path: remove trailing seperator
-    if dirpath[-1] == os.sep:
-        config_path = dirpath[:-1] + ".json"
-    else:
-        config_path = dirpath + ".json"
+    confpath = dirpath_to_confpath(dirpath)
     #Get all csv files
     record_files = [os.path.join(dirpath, filepath)
         for filepath in os.listdir(dirpath)
         if filepath.endswith('.csv')
     ]
     # Write JSON config file
-    with open(config_path, 'w') as config_file:
+    with open(confpath, 'w') as config_file:
         json.dump({'data': record_files}, config_file)
-    return config_path
+    return confpath
     
     
 
@@ -122,11 +180,12 @@ def is_RecordChunk(value):
     return False
 dispatcher_extensions = ['.json', '.config']
 def is_Dispatcher(value):
-    if os.path.exists(value) and os.path.isfile(value):
-        _, ext = os.path.splitext(value)
-        if ext in dispatcher_extensions:
-            return True
-    return False
+    return IndexDispatcher.valid_filepath(value)
+#     if os.path.exists(value) and os.path.isfile(value):
+#         _, ext = os.path.splitext(value)
+#         if ext in dispatcher_extensions:
+#             return True
+#     return False
 def is_URL(value):
     if value.startswith("http://"):
         return True
