@@ -21,6 +21,7 @@ Immediate work-plan
 
 
 
+
 [] Setup flask
 	[] Need automatic creation of a little directory
 	[] Which provides REST access:
@@ -34,17 +35,16 @@ Immediate work-plan
 [] What needs to be in the URL namespace of the servers?
 	[] Whatever is in it's config
 		
-[] URLDispatcher
-[] Web server - with capability to:
-		
-		
-[] Read problem_statement CAREFULLY
-	[] Make notes
-	[] Step 1: Make data for 100,000 records + timestamp
-		[] Gauge size of single record: memory and on disk:
-	[] Step 2: Timeit: linear scan on hard-drive: 
-	[] Step 4: Load into memory: records
-	[] Step 3: Timeit: linear scan in memory
+
+
+
+[] TIMETEST! 
+[] Time + space estimation!
+[] Writeup 'Future Directions' improvements:
+	[] Recording time-range in each file (inside config)
+		[] allow pre-empting the scan for most files
+	[] ctypes
+	[] 'sleep_scan' via grep
 
 [] Need to write about assumption: files are written to *in-order*
 	[] either logs are written that way, or server collects access logs
