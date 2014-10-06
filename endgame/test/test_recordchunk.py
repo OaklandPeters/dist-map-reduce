@@ -6,12 +6,16 @@ from endgame.indexes import RecordChunk
 from endgame.interfaces import Record, Query
 from endgame.deploy import IPv4
 
-rootdir = os.getcwd()
-testdir = os.path.join(rootdir, 'endgame', 'test')
+#print(__file__)
+testdir = os.path.split(__file__)[0]
+os.chdir(testdir)
+
+#rootdir = os.getcwd()
+#testdir = os.path.join(rootdir, 'endgame', 'test')
 
 class RecordChunkTests(unittest.TestCase):
     def setUp(self):
-        os.chdir(testdir)
+        #os.chdir(testdir)
         self.filename = 'stable_1k.csv'
         self.count = 1000
         #stable_1k_2.csv, row #50

@@ -1,6 +1,9 @@
 Immediate work-plan
 -----------------------
 
+[] Develop ability for IndexDispatcher to link to one another
+	[] plan
+
 [] Setup flask
 	[] Need automatic creation of a little directory
 	[] Which provides REST access:
