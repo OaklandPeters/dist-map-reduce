@@ -7,6 +7,12 @@ from endgame.deploy import write_record_dir
 from endgame.interfaces import Record
 
 
+testdir = os.path.split(__file__)[0]
+datadir = os.path.join(testdir, 'datafiles')
+os.chdir(datadir)
+
+
+
 class DeployRecordsTests(unittest.TestCase):
     def setUp(self):
         self.filename = '1k.csv'

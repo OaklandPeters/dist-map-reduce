@@ -6,6 +6,12 @@ from endgame.indexes import IndexDispatcher, directory_to_config, RecordChunk
 from endgame.interfaces import Query, Record
 
 
+testdir = os.path.split(__file__)[0]
+datadir = os.path.join(testdir, 'datafiles')
+os.chdir(datadir)
+
+
+
 class MetaIndexTests(unittest.TestCase):
     def setUp(self):
         self.meta_path = 'stable_metaindex.json'

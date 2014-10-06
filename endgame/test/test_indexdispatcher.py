@@ -5,6 +5,10 @@ import os
 from endgame.indexes import IndexDispatcher, directory_to_config, RecordChunk
 from endgame.interfaces import Query, Record
 
+testdir = os.path.split(__file__)[0]
+datadir = os.path.join(testdir, 'datafiles')
+os.chdir(datadir)
+
 
 class IndexDispatcherTests(unittest.TestCase):
     """

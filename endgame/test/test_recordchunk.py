@@ -8,7 +8,8 @@ from endgame.deploy import IPv4
 
 #print(__file__)
 testdir = os.path.split(__file__)[0]
-os.chdir(testdir)
+datadir = os.path.join(testdir, 'datafiles')
+os.chdir(datadir)
 
 #rootdir = os.getcwd()
 #testdir = os.path.join(rootdir, 'endgame', 'test')
