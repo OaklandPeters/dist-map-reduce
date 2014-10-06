@@ -1,9 +1,6 @@
 Immediate work-plan
 -----------------------
 
-[] Develop ability for IndexDispatcher to link to one another
-	[] plan
-
 [] Setup flask
 	[] Need automatic creation of a little directory
 	[] Which provides REST access:
@@ -13,7 +10,9 @@ Immediate work-plan
 		[] Maybe generate the config file for a folder, as needed
 	[] Generate the IndexDispatcher object for the config file
 	[] Pass down to the command the IndexDispatcher
-		
+
+[] What needs to be in the URL namespace of the servers?
+	[] Whatever is in it's config
 		
 [] URLDispatcher
 [] Web server - with capability to:
