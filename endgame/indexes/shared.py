@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 import os
 import json
+import collections
+import itertools
 
 __all__ = [
     'dirpath_to_confpath',
@@ -45,3 +47,10 @@ def directory_to_config(dirpath):
     with open(confpath, 'w') as config_file:
         json.dump({'data': record_files}, config_file)
     return confpath
+
+def is_nonstringsequence(value):
+    return isinstance(value, collections.Sequence) and not isinstance(value, basestring)
+
+def flatten(seq_of_seq):
+    "Flatten one level of nesting"
+    return itertools.chain.from_iterable(seq_of_seq)

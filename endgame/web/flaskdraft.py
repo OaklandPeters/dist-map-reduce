@@ -10,6 +10,14 @@ funcs[key] = webdispatch.route(key)(func)
 
 [] I also need a mapping from the configuration file names to url divisions
 
+
+Getting url query:
+from flask import request
+
+@app.route('/data')
+def data():
+    # here we want to get the value of user (i.e. ?user=some-value)
+    user = request.args.get('user')
 """
 from __future__ import absolute_import
 import os

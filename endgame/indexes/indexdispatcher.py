@@ -1,12 +1,11 @@
 from __future__ import absolute_import
 import os
 import json
-import itertools
-import collections
 from ..interfaces import IndexABC
 #from .recordchunk import RecordChunk
 #from .urldispatcher import URLDispatcher
-from .shared import dirpath_to_confpath, confpath_to_dirpath, directory_to_config
+from .shared import (dirpath_to_confpath, confpath_to_dirpath, 
+    directory_to_config, flatten, is_nonstringsequence)
 from .classify import classify_index
 
 
@@ -23,30 +22,21 @@ class IndexDispatcher(IndexABC):
         self.data = None # 'sleeping'
     
     
-    
     #--------------------------------------------------------------------------
-    #    File Interaction
+    #    Map/Reduce
     #--------------------------------------------------------------------------
-    def read(self):
-        """Read configuration file, and return iterator over it's data."""
-        with open(self.confpath, 'r') as config_file:
-            config = json.load(config_file)
-            
-        for elm in config['data']:
-            if is_nonstringsequence(elm):
-                yield os.path.join(*elm)
-            elif isinstance(elm, basestring):
-                yield elm
-            else:
-                raise RuntimeError("Logic error.")
-            
-        #return iter(config['data'])
-    @classmethod
-    def write(cls, dirpath):
-        """Create configuration file, based on a directory."""
-        return directory_to_config(dirpath)
-        
-    
+    def map(self, query):
+        self.wake_up()
+        return [
+            elm.find(query)
+            for elm in self.data
+        ]
+    def reduce(self, records, query):
+        """Flatten one-level of nesting, removing empty sequences, and then
+        return records sorted by timestamp."""
+        flattened = flatten(records)
+        processed = sorted(flattened, key=lambda record: record.timestamp)
+        return processed
 
     #--------------------------------------------------------------------------
     #    Dispatching
@@ -88,31 +78,37 @@ class IndexDispatcher(IndexABC):
 
     
     #--------------------------------------------------------------------------
-    #    Map/Reduce
+    #    File Interaction
     #--------------------------------------------------------------------------
-    def map(self, query):
-        self.wake_up()
-        return [
-            elm.find(query)
-            for elm in self.data
-        ]
-    def reduce(self, records, query):
-        """Flatten one-level of nesting, removing empty sequences, and then
-        return records sorted by timestamp."""
-        flattened = flatten(records)
-        processed = sorted(flattened, key=lambda record: record.timestamp)
-        return processed
-    # Wake/Sleep Interface
+    def read(self):
+        """Read configuration file, and return iterator over it's data."""
+        with open(self.confpath, 'r') as config_file:
+            config = json.load(config_file)
+            
+        for elm in config['data']:
+            if is_nonstringsequence(elm):
+                yield os.path.join(*elm)
+            elif isinstance(elm, basestring):
+                yield elm
+            else:
+                raise RuntimeError("Logic error.")
+            
+        #return iter(config['data'])
+    @classmethod
+    def write(cls, dirpath):
+        """Create configuration file, based on a directory."""
+        return directory_to_config(dirpath)
+    # ----------------------------   Wake/Sleep Interface
     @property
     def awake(self):
         if self.data is None:
             return False
         else:
             return True
-    @property
-    def state(self):
-        return self.awake
     def sleep(self):
+        """Recursively remove data."""
+        for index in self.data:
+            index.sleep()
         self.data = None
     def wake_up(self):
         self.data = list(self.wake_iter())
@@ -138,43 +134,14 @@ class IndexDispatcher(IndexABC):
     def __str__(self):
         return "{name}({data})".format(
             name = type(self).__name__,
-            data = str(self.data)
+            #data = str(self.data)
+            #... limit length displayed
+            data = [str(elm)[:20] for elm in self.data]
         )
     def __repr__(self):
         return "{name}({data})".format(
             name = type(self).__name__,
-            data = repr(self.data)
+            #data = repr(self.data)
+            #... limit length displayed
+            data = [repr(elm)[:20] for elm in self.data]
         )
-
-
-
-
-
-
-
-#------------------------------------------------------------------------------
-#    Local Utility Functions
-#------------------------------------------------------------------------------
-def is_nonstringsequence(value):
-    return isinstance(value, collections.Sequence) and not isinstance(value, basestring)
-
-def flatten(seq_of_seq):
-    "Flatten one level of nesting"
-    return itertools.chain.from_iterable(seq_of_seq)
-
-
-# def classify_index(instring):
-#     """classify_index(basestring: instring) --> IndexABC subclass
-# 
-#     Based on instring, return a appropriate IndexABC subclass - one
-#     descendant of IndexABC (RecordChunk or IndexDispatcher or URLDispatcher).
-#     'instring' is usually read from IndexDispatcher's config file
-#     """
-#     if RecordChunk.valid(instring):
-#         return RecordChunk
-#     elif IndexDispatcher.valid(instring):
-#         return IndexDispatcher
-#     elif URLDispatcher.valid(instring):
-#         return URLDispatcher
-#     else:
-#         raise TypeError("Unrecognized index type for "+str(instring))

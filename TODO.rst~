@@ -1,14 +1,25 @@
 Immediate work-plan
 -----------------------
-[] validators.py
-	[] Refactor from IndexDispatcher
-	[] Refactor from RecordChunk
-	[] Refactor from URLDispatcher
-	[] Add to __init__.py
-[] Fix up classifier
+
+[] urldispatcher:
+	[] corresponds to URL of a miniserver
+	[] wake_up(): confirms miniserver is awake, and then populates data with single entry
+	[] find(): 
+		[] map(): send HTTP request to the single miniserver
+		[] reduce(): pass-through
+
+[] miniserver:
+	[] Corresponds to a config file
+	[] Initialization == booting up miniserver
+	[] RESPONSE: list of data-contents
+	[] RESPONSE: query --> results of find
+	[] Must have most of the structure of IndexABC
+		[] map/reduce/find
+		[] awake/wake_up/sleep
+		[] 
 
 
-[] Stub: URLDispatcher: similar to IndexDispatcher
+
 
 [] Setup flask
 	[] Need automatic creation of a little directory

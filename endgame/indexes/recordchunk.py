@@ -6,12 +6,14 @@ from ..interfaces import IndexABC, Record
 
 class RecordChunk(IndexABC):
     """Corresponds to a single log file.
+    Constructor takes path of record file
     Considered to be live when data != None
+    
     
     @todo: data --> VProperty, assumed to be None or list
     """
     def __init__(self, filepath):
-        self.filepath = filepath
+        self.filepath = filepath # path of record file
         self.data = None
     
     def sleep(self):
@@ -55,18 +57,6 @@ class RecordChunk(IndexABC):
             if record in query:
                 yield record
     
-    
-    def __str__(self):
-        return "{name}({data})".format(
-            name = type(self).__name__,
-            data = str(self.data)
-        )
-    def __repr__(self):
-        return "{name}({data})".format(
-            name = type(self).__name__,
-            data = repr(self.data)
-        )
-    
     #--------------------------------------------------------------------------
     #    Dispatching
     #--------------------------------------------------------------------------
@@ -82,3 +72,17 @@ class RecordChunk(IndexABC):
             if fext in cls.chunk_extensions:
                 return True
         return False
+    
+    #--------------------------------------------------------------------------
+    #   Magic Methods
+    #--------------------------------------------------------------------------
+    def __str__(self):
+        return "{name}({data})".format(
+            name = type(self).__name__,
+            data = str(self.data)
+        )
+    def __repr__(self):
+        return "{name}({data})".format(
+            name = type(self).__name__,
+            data = repr(self.data)
+        )

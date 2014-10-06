@@ -15,7 +15,6 @@ class IndexABC(object):
     
     # Wake/Sleep Interface
     awake = abc.abstractproperty()
-    state = abc.abstractproperty()
     wake_up = abc.abstractmethod(lambda *args, **kwargs: NotImplemented)
     sleep = abc.abstractmethod(lambda *args, **kwargs: NotImplemented)
     
