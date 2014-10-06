@@ -4,10 +4,12 @@ import os
 
 from endgame.indexes import IndexDispatcher, directory_to_config, RecordChunk
 from endgame.interfaces import Query, Record
+import endgame.test.sample_query as stable_query
 
 testdir = os.path.split(__file__)[0]
 datadir = os.path.join(testdir, 'datafiles')
 os.chdir(datadir)
+
 
 
 class IndexDispatcherTests(unittest.TestCase):
@@ -21,13 +23,16 @@ class IndexDispatcherTests(unittest.TestCase):
         if not os.path.exists(self.dirpath):
             raise RuntimeError("Necessary test data directory does not exist.")
         
-        #stable_1k_2.csv, row #50
-        self.target_entry = ('34.53.12.162', 1412534621.53)
-        self.target_record = Record(*self.target_entry)
-        self.query = Query(
-            '34.53.12.162',
-            (1412534621.529, 1412534621.531)
-        )
+        #import endgame.test.stable_query as stable_query
+        self.target_entry = stable_query.target_entry
+        self.target_record = stable_query.target_record
+        self.query = stable_query.query
+#         self.target_entry = ('34.53.12.162', 1412534621.53)
+#         self.target_record = Record(*self.target_entry)
+#         self.query = Query(
+#             '34.53.12.162',
+#             (1412534621.529, 1412534621.531)
+#         )
         
     def test_directory_to_config(self):
         config_path = directory_to_config(self.dirpath)
@@ -51,12 +56,9 @@ class IndexDispatcherTests(unittest.TestCase):
     def test_find(self):
         dispatcher = IndexDispatcher(self.dirpath)
         results = dispatcher.find(self.query)
-        expected = [
-            Record('34.53.12.162', 1412534621.529),
-            Record('34.53.12.162', 1412534621.53)
-        ]
-        self.assert_(expected[0] in results)
-        self.assert_(expected[1] in results)
+
+        self.assert_(self.target_record in results)
+        self.assert_(len(results) >= 2)
 
 
 if __name__ == "__main__":

@@ -77,9 +77,17 @@ def validate_timestamp(value, name='object'):
 #==============================================================================
 #    Conversions
 #==============================================================================
+def get_total_seconds(delta):
+    """Polyfill for 'delta.total_seconds' from Python 2.7"""
+    if hasattr(delta, 'total_seconds'):
+        return delta.total_seconds
+    else:
+        return (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 1e6) / 1e6
+
 def datetime_to_timestamp(dt):
     #return (dt - timerange.timerange(1970, 1, 1)).total_seconds()
-    return (dt - datetime.datetime(1970, 1, 1, 0, 0)).total_seconds()
+    #return (dt - datetime.datetime(1970, 1, 1, 0, 0)).total_seconds()
+    return get_total_seconds(dt - datetime.datetime(1970, 1, 1, 0, 0))
     
 dt2ts = datetime_to_timestamp
     #return timerange.mktime(dt.timetuple())

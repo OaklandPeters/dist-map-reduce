@@ -2,11 +2,16 @@ from __future__ import absolute_import
 import os
 import json
 import itertools
+import collections
 from ..interfaces import IndexABC
 from .recordchunk import RecordChunk
 from .urldispatcher import URLDispatcher
 
 __all__ = ['IndexDispatcher', 'directory_to_config']
+
+
+def is_nonstringsequence(value):
+    return isinstance(value, collections.Sequence) and not isinstance(value, basestring)
 
 class IndexDispatcher(IndexABC):
     """Dispatches to other indexes or record-chunks."""
@@ -26,11 +31,21 @@ class IndexDispatcher(IndexABC):
         """Read configuration file, and return iterator over it's data."""
         with open(self.confpath, 'r') as config_file:
             config = json.load(config_file)
-        return iter(config['data'])
+            
+        for elm in config['data']:
+            if is_nonstringsequence(elm):
+                yield os.path.join(*elm)
+            elif isinstance(elm, basestring):
+                yield elm
+            else:
+                raise RuntimeError("Logic error.")
+            
+        #return iter(config['data'])
     @classmethod
     def write(cls, dirpath):
         """Create configuration file, based on a directory."""
         return directory_to_config(dirpath)
+        
     dispatcher_extensions = ['.json', '.config']
     @classmethod
     def _validate_confpath(cls, filepath):
@@ -107,30 +122,17 @@ class IndexDispatcher(IndexABC):
         Assumes each element from self.read() is a basestring.
         """
         for elm in self.read():
-            
             index = classify_index(elm) # Find index type
-            # yield index(elm) # Construct type
-            print(index)
-            print()
+            yield index(elm) # Instantiate and return type
             
-            if RecordChunk.valid(elm):
-                yield RecordChunk(elm)
-            elif IndexDispatcher.valid(elm):
-                yield IndexDispatcher(elm)
-            elif URLDispatcher.valid(elm):
-                yield URLDispatcher(elm)
-            else:
-                raise TypeError("Unrecognized element type.")
-
-#             if is_RecordChunk(elm):
-#                 
-#             elif is_Dispatcher(elm):
+#             if RecordChunk.valid(elm):
+#                 yield RecordChunk(elm)
+#             elif IndexDispatcher.valid(elm):
 #                 yield IndexDispatcher(elm)
-#             elif is_URL(elm):
+#             elif URLDispatcher.valid(elm):
 #                 yield URLDispatcher(elm)
 #             else:
 #                 raise TypeError("Unrecognized element type.")
-
 
     #--------------------------------------------------------------------------
     #    Magic Methods
@@ -168,7 +170,7 @@ def dirpath_to_confpath(dirpath):
     return confpath
 
 def confpath_to_dirpath(confpath):
-    cname, cext = os.path.splitext(confpath)
+    cname, _ = os.path.splitext(confpath)
     return cname
 
 def directory_to_config(dirpath):
@@ -184,7 +186,8 @@ def directory_to_config(dirpath):
     # Write config_path: remove trailing seperator
     confpath = dirpath_to_confpath(dirpath)
     #Get all csv files
-    record_files = [os.path.join(dirpath, filepath)
+    record_files = [
+        pathsequence(os.path.join(dirpath, filepath))
         for filepath in os.listdir(dirpath)
         if filepath.endswith('.csv')
     ]
@@ -192,6 +195,9 @@ def directory_to_config(dirpath):
     with open(confpath, 'w') as config_file:
         json.dump({'data': record_files}, config_file)
     return confpath
+
+def pathsequence(fullpath):
+    return fullpath.split(os.sep)
     
 
 #------------------------------------------------------------------------------
@@ -205,13 +211,12 @@ def flatten(seq_of_seq):
 #------------------------------------------------------------------------------
 #    Classifiers
 #------------------------------------------------------------------------------
-index_types = [RecordChunk, IndexDispatcher, URLDispatcher]
 def classify_index(instring):
     """classify_index(basestring: instring) --> IndexABC subclass
 
     Based on instring, return a appropriate IndexABC subclass - one
     descendant of IndexABC (RecordChunk or IndexDispatcher or URLDispatcher).
-    'instring' is usually read from IndexDispatcher's config file    
+    'instring' is usually read from IndexDispatcher's config file
     """
     if RecordChunk.valid(instring):
         return RecordChunk

@@ -7,8 +7,7 @@ __all__ = [
     'read_records',
     'IPv4',
     'TimeStamp',
-    'write_record_dir',
-    'DispatcherDirABF'
+    'write_record_dir'
 ]
 
 from .make_record import (
@@ -18,4 +17,4 @@ from .make_record import (
 
 from .make_dispatcher import (write_record_dir)
 
-from .deploy_stable import DispatcherDirABF
+#from .deploy_stable import DispatcherDirABF

@@ -9,7 +9,9 @@ from endgame.deploy import write_record_dir
 from endgame.extern.abf import ABFMeta
 import abc
 
-__all__ = ['DispatcherDirABF']
+#__all__ = ['DispatcherDirABF']
+
+
 
 class DispatcherDirABF(object):
     """Operator style class.
@@ -19,16 +21,18 @@ class DispatcherDirABF(object):
     namestub = abc.abstractproperty()
     filecount = abc.abstractproperty()
     recordcount = abc.abstractproperty()
+    datadir = os.path.join('..', 'test', 'datafiles') #defaultvalue
     startat = 0 #default value
     @classmethod
     def __call__(cls):
         return cls.make()
     @classmethod
     def make(cls):
-        if os.path.exists(cls.dirname):
-            shutil.rmtree(cls.dirname)
+        dirpath = os.path.join(cls.datadir, cls.dirname)
+        if os.path.exists(dirpath):
+            shutil.rmtree(dirpath)
         write_record_dir(
-            cls.dirname,
+            dirpath,
             cls.namestub,
             filecount = cls.filecount,
             recordcount = cls.recordcount,
@@ -57,13 +61,15 @@ class Stable3(DispatcherDirABF):
     startat = 10
     
 class Stable4(DispatcherDirABF):
-    dirname   = os.path.join('..', 'test', 'stable_dispatcher4')
+    #dirname   = os.path.join('..', 'test', 'datafiles', 'stable_dispatcher4')
+    dirname = 'stable_dispatcher4'
     namestub  = 'stable_1k'
     filecount = 5
     recordcount = 1000
     startat = 15
 
-#Stable1.make()
-#Stable2.make()
-#Stable3.make()
-#Stable4.make()
+if __name__ == "__main__":
+    Stable1.make()
+    Stable2.make()
+    Stable3.make()
+    Stable4.make()

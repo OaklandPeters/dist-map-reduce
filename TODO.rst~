@@ -2,8 +2,6 @@ Immediate work-plan
 -----------------------
 
 [] Refactor file name read/write: recordchunk
-	[] System agnostic method:
-
 
 [] refactor: dispatching on string: remove from IndexDispatcher
 

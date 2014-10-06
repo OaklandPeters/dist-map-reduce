@@ -20,17 +20,27 @@ class RecordChunk(IndexABC):
     def wake_up(self):
         self.data = list(self.read())
 
+    #--------------------------------------------------------------------------
+    #    File I/O
+    #--------------------------------------------------------------------------
     def read(self):
         with open(self.filepath, 'rb') as infile:
             csvreader = csv.reader(infile)
             for row in csvreader:
                 yield Record(row[0], row[1])
+    @property
+    def awake(self):
+        if self.data is None:
+            return False
+        else:
+            return True
+    @property
+    def state(self):
+        return self.awake
 
-#     def find(self, query):
-#         found = self.map(query)
-#         reduced = self.reduce(found, query) 
-#         return reduced
-    
+    #--------------------------------------------------------------------------
+    #    Map/Reduce
+    #--------------------------------------------------------------------------    
     def map(self, query):
         return list(self.imap(query))
     def imap(self, query):
@@ -46,15 +56,7 @@ class RecordChunk(IndexABC):
             if record in query:
                 yield record
     
-    @property
-    def awake(self):
-        if self.data is None:
-            return False
-        else:
-            return True
-    @property
-    def state(self):
-        return self.awake
+    
     def __str__(self):
         return "{name}({data})".format(
             name = type(self).__name__,
