@@ -60,12 +60,10 @@ class WebIndexTests(unittest.TestCase):
         web = WebIndex(index)
         web.process_up()
         urldisp = URLDispatcher(self.baseurl)
-        urldisp.find(self.query)
+        results = urldisp.find(self.query)
+        self.assert_(len(results) >= 3)
+        self.assert_(self.target_record in results)
         
-        print()
-        #Setup URLDispatcher, pointing to the webindex
-        #Send the call
-        #Receive it, and decode from string
 
 
 

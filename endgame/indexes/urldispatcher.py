@@ -8,7 +8,8 @@ from __future__ import absolute_import
 import os
 import json
 import requests
-from ..interfaces import IndexABC
+import ast
+from ..interfaces import IndexABC, Record, Query
 from .indexdispatcher import IndexDispatcher
 from .shared import is_nonstringsequence, directory_to_config, flatten, query_to_url
 
@@ -30,6 +31,10 @@ class URLDispatcher(IndexABC):
     #--------------------------------------------------------------------------
     #    Map/Reduce
     #--------------------------------------------------------------------------
+    def find(self, query):
+        records = self.map(query)
+        reduced = self.reduce(records, query)
+        return reduced
     def map(self, query):
         self.wake_up()  # presently does nothing
         fullurl = self.urlpath + query_to_url(query)
@@ -112,7 +117,6 @@ class URLDispatcher(IndexABC):
 
 def send_request(fullurl):
     response = requests.get(fullurl)
-    # Unpack this
-    print()
-    raise RuntimeError("Why aren't you debugging?")
-    return response
+    #Unpack this
+    raw = ast.literal_eval(response.text)
+    return [Record(*rec) for rec in raw] #pylint: disable=star-args

@@ -59,7 +59,7 @@ def query_to_url(query):
     """Convert a query object to a URL query term."""
     template = "find/{ips}/{start}/{end}/"
     return template.format(
-        ips = query.ips,
+        ips = str(query.ips).replace('\'', ''),
         start = query.timerange.start,
         end = query.timerange.end
     )

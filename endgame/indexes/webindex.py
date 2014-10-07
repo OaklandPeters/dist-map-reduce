@@ -80,10 +80,6 @@ class WebIndex(object):
         found = self.index.find(query)
         return str(found)
         
-        msg = "query {klass}: {value}".format(
-            klass = type(query).__name__, value = query
-        )
-        return msg
     sleep_rule = '/sleep'
     @staticmethod
     def sleep_response():
