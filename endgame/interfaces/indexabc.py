@@ -29,13 +29,14 @@ class IndexABC(object):
         """The recursion step. Combines map + reduce
         Single argument should be a Query object.
         """
-        # Map
-        # found = map(finder(query), self.data)
         found = self.map(query)
-        
-        # Reduce
-        # This step should be changed for RecordChunk indexes 
-        # ... filter
-        reduced = self.reduce(found, query) 
-        
+        reduced = self.reduce(found, query)
         return reduced
+    def __enter__(self):
+        #self.wake_up() - actually should NOT always wake_up
+        return self
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.sleep()
+        
+        
+    

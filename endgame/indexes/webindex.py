@@ -25,25 +25,62 @@ class WebIndex(object):
         self.index = index
         self.app = self.build_app()
         self.server = None # 'sleeping'
-    
+        self.process = None
 
-    
+    #--------------------------------------------------------------------------
+    #    Map/Reduce
+    #--------------------------------------------------------------------------
+    def map(self, query):
+        return self.index.map(query)
+    def reduce(self, records, query):
+        return self.index.reduce(records, query)
+    def find(self, query):
+        records = self.map(query)
+        return self.reduce(records, query)    
+
+    #--------------------------------------------------------------------------
+    #    App Up/Down
+    #--------------------------------------------------------------------------
     def wake_up(self, *args, **kwargs):
+        ret = self.app.run(*args, **kwargs)
+        print(ret)
+        return ret
+    
         return self.app.run(*args, **kwargs)
-    def sleep(self):
-        shutdown_webindex()
+    
+    
+    def sleep(self, datano=None):
+        if datano is None:
+            for elm in self.index.data:
+                elm.sleep()
+        self.index.sleep()
+        try:
+            shutdown_webindex()
+            return "Shutting down WebIndex '{0}'".format(self.name)
+        except WebSleepError:
+            return "WebIndex '{0}' appears to be already shutdown."
+
     def build_app(self):
         app = Flask(self.index.name)
         app.url_map.converters['list'] = ListConverter
         app.url_map.converters['float'] = FloatConverter
         
+        def finder(*args, **kwargs):
+            return self.find_response(*args, **kwargs)
+        def sleeper(*args, **kwargs):
+            return self.sleep_response(*args, **kwargs)
+        #finder = lambda *args, **kwargs: self.find_response(*args, **kwargs)
+        #sleeper = lambda *args, **kwargs: self.sleep_response(*args, **kwargs)
         
-        finder = lambda *args, **kwargs: self.find_response(*args, **kwargs)
         app.route(self.find_rule)(finder)
-        #app.route(self.find_rule)(self.find_response)
-        app.route(self.sleep_rule)(self.sleep_response)
-        return app
+        #app.route(self.static_sleep_rule)(self.static_sleep_response)
+        app.route(self.sleep_rule)(sleeper)
         
+        return app
+    
+    #--------------------------------------------------------------------------
+    #    Properties
+    #--------------------------------------------------------------------------
     @VProperty
     class index(object):
         def _get(self):
@@ -59,16 +96,16 @@ class WebIndex(object):
                 raise TypeError("Invalid 'index': should be IndexDispatcher, "
                     "or path to config file or data directory.")
     @property
-    def confpath(self):
-        return self.index.confpath
+    def name(self):
+        return self.index.name
+    @property
+    def port(self):
+        return self.index.config['port']
+    @property
+    def configpath(self):
+        return self.index.configpath
 
-    def map(self, query):
-        return self.index.map(query)
-    def reduce(self, records, query):
-        return self.index.reduce(records, query)
-    def find(self, query):
-        records = self.map(query)
-        return self.reduce(records, query)
+
     #--------------------------------------------------------------
     #    REST API
     #--------------------------------------------------------------
@@ -80,44 +117,41 @@ class WebIndex(object):
         found = self.index.find(query)
         return str(found)
         
-    sleep_rule = '/sleep'
-    @staticmethod
-    def sleep_response():
+    
+    sleep_rule = '/sleep/<int:datano>/'
+    #def sleep_response(self, datano=None):
+    #    self.sleep()
+    def sleep_response(self):
         shutdown_webindex()
-        return "Shutting down WebIndex"
     
-    def process_up(self):
-        p = Process(target=startup_webindex, args=(self.confpath,))
-        p.start()
+    static_sleep_rule = '/sleep'
+    @staticmethod
+    def static_sleep_response():
+        shutdown_webindex()
+
+    def process_up(self, *args, **kwargs):
+        self.process = Process(
+            target=startup_webindex,
+            args=(self.configpath,)+args,
+            kwargs=kwargs
+        )
+        
+        self.process.start()
         #p.join()
-        return p
+        return self.process
         
         
 
-    #Alternate shutdown - using multiprocessing
-    #from multiprocessing import Process
-#     def process_up(self):
-#         self.server = Process(target=self.app.run)
-#         self.server.start
-#     def process_down(self):
-#         self.server.terminate()
-#         self.server.join()
 
-def startup_webindex(confpath):
-    index = IndexDispatcher(confpath)
-    web = WebIndex(index)
-    web.wake_up()
-    
 
-def shutdown_webindex():
-    down = request.environ.get('werkzeug.server.shutdown')
-    if down is None:
-        raise RuntimeError('Not using werkzeug. Why?')
-    down()
+
 
 #--------------------------------------------------------------------------
 #    Local Utility
 #--------------------------------------------------------------------------
+class WebSleepError(RuntimeError):
+    pass
+
 class ListConverter(BaseConverter):
     def to_python(self, value):
         return str(value).strip('[]').split(',')
@@ -131,3 +165,23 @@ class FloatConverter(BaseConverter):
         return float(value)
     def to_url(self, value):
         return str(value)
+
+def startup_webindex(confpath, *args, **kwargs):
+    """Startup a webindex corresponding to a configuration file path.
+    Necessary as a top-level function to allow multiprocessing to work.
+    """
+    index = IndexDispatcher(confpath)
+    web = WebIndex(index)
+    return web.wake_up(*args, **kwargs)
+    
+    
+
+def shutdown_webindex():
+    try:
+        down = request.environ.get('werkzeug.server.shutdown')
+    except RuntimeError as exc: #recast as more specific exception
+        raise WebSleepError("Cannot sleep. "+str(exc))
+    
+    if down is None:
+        raise RuntimeError('Not using werkzeug. Why?')
+    down()

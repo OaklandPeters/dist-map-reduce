@@ -32,23 +32,25 @@ def launch(configpath):
 
 class WebIndexTests(unittest.TestCase):
     def setUp(self):
-        self.configpath = os.path.join(datadir, 'stable_metaindex.json')
+        self.metapath = os.path.join(datadir, 'stable_metaindex.json')
+        self.metapath2 = os.path.join(datadir, 'stable_metaindex2.json')
         self.target_entry = stable_query.target_entry
         self.target_record = stable_query.target_record
         self.query = stable_query.query
         self.baseurl = 'http://127.0.0.1:5000/'
         # Example url:
         # http://127.0.0.1:5000/find/[3.42.225.161]/1412619807.79/1412619808.59/
-#     def test_basic(self):
-#         index = IndexDispatcher(self.configpath)
-#         web = WebIndex(index)
-# 
-#         web.wake_up(debug=True)
+    def test_basic(self):
+        index = IndexDispatcher(self.metapath)
+        web = WebIndex(index)
+ 
+        web.wake_up(debug=True)
+        print()
     def test_multiprocess(self):
-        index = IndexDispatcher(self.configpath)
+        index = IndexDispatcher(self.metapath)
+        #with WebIndex(index) as web:
         web = WebIndex(index)
         web.process_up()
-        
         results = web.find(self.query)
         web.sleep()
         
@@ -56,13 +58,16 @@ class WebIndexTests(unittest.TestCase):
         self.assert_(self.target_record in results)
 
     def test_from_urldispatcher(self):
-        index = IndexDispatcher(self.configpath)
+        index = IndexDispatcher(self.metapath)
         web = WebIndex(index)
-        web.process_up()
+        web.process_up(debug=True)
         urldisp = URLDispatcher(self.baseurl)
         results = urldisp.find(self.query)
         self.assert_(len(results) >= 3)
         self.assert_(self.target_record in results)
+    
+    def test_urldispatcher_to_urldispatcher(self):
+        pass
         
 
 

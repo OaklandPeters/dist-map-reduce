@@ -25,7 +25,7 @@ def confpath_to_dirpath(confpath):
 def pathsequence(fullpath):
     return fullpath.split(os.sep)
 
-def directory_to_config(dirpath):
+def directory_to_config(dirpath, **keywords):
     """Create a configuration file for dirpath, and return it's filepath.
     Place the configuration file on level with the directory. IE:
     parent/
@@ -33,6 +33,9 @@ def directory_to_config(dirpath):
         {dirpath}.json
         
     """
+    if 'data' in keywords:
+        raise TypeError("Invalid keyword: 'data'")
+
     if not os.path.isdir(dirpath):
         raise ValueError("{0} is not an existing directory.".format(dirpath))
     # Write config_path: remove trailing seperator
@@ -43,9 +46,12 @@ def directory_to_config(dirpath):
         for filepath in os.listdir(dirpath)
         if filepath.endswith('.csv')
     ]
+    
     # Write JSON config file
+    keywords['data'] = record_files
     with open(confpath, 'w') as config_file:
-        json.dump({'data': record_files}, config_file)
+        #json.dump({'data': record_files}, config_file)
+        json.dump(keywords, config_file)
     return confpath
 
 def is_nonstringsequence(value):

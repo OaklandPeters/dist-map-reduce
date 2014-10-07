@@ -18,13 +18,6 @@ class MetaIndexTests(unittest.TestCase):
         self.meta_path = 'stable_metaindex.json'
         #stable_1k_2.csv, row #50
         #also added to stable_dispatcher2/stable_1k_5.csv row #1001
-#         self.target_entry = ('34.53.12.162', 1412534621.53)
-#         self.target_record = Record(*self.target_entry)
-#         self.query = Query(
-#             '34.53.12.162',
-#             (1412534621.529, 1412534621.531)
-#         )
-        #
         self.target_entry = stable_query.target_entry
         self.target_record = stable_query.target_record
         self.query = stable_query.query
@@ -48,6 +41,24 @@ class MetaIndexTests(unittest.TestCase):
         for record in results:
             self.assert_(record in self.query)
 
+class MetaMetaTests(unittest.TestCase):
+    def setUp(self):
+        self.meta_path = 'stable_metaindex.json'
+        self.meta2_path = 'stable_metaindex2.json'
+        #stable_1k_2.csv, row #50
+        #also added to stable_dispatcher2/stable_1k_5.csv row #1001
+        self.target_entry = stable_query.target_entry
+        self.target_record = stable_query.target_record
+        self.query = stable_query.query
+    def test_find(self):
+        meta2 = IndexDispatcher(self.meta2_path)
+        meta2.wake_up()
+        results = meta2.find(self.query)
 
+        self.assert_(len(results) >= 4)
+        for record in results:
+            self.assert_(record in self.query)
+        
+        
 if __name__ == "__main__":
     unittest.main()

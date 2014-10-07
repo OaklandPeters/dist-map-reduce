@@ -1,28 +1,32 @@
 Immediate work-plan
 -----------------------
-
-! Need to find a way to wrap a Flask instance around an IndexDispatcher
-
-[] urldispatcher:
-	[] corresponds to URL of a miniserver
-	[] wake_up(): confirms miniserver is awake, and then populates data with single entry
-	[] find(): 
-		[] map(): send HTTP request to the single miniserver
-		[] reduce(): pass-through
-
-[] miniserver:
-	[] Corresponds to a config file
-	[] Initialization == booting up miniserver
-	[] RESPONSE: list of data-contents
-	[] RESPONSE: query --> results of find
-	[] Must have most of the structure of IndexABC
-		[] map/reduce/find
-		[] awake/wake_up/sleep
-		[] valid
+[] static sleep response
+	[] Use sleeper: self.sleep_response
+[] updating config['port'] on closeout/sleep
+	
+	
 
 
 
+[] Get indexdispatcher using write_config
+	[] Have it trigger on shutdown - to reflect port
+[] Add context-manager to IndexABC
 
+[] Have indexdispatcher config files be created with a port number
+	[] Somehow different from one another
+
+[] Allow config to be changed by indexdispatcher
+
+[] IndexDispatcher: port number
+	[] Record in config file
+	[] Read from config file
+	[] access during construction
+		[] Find out if it needs to be int or str
+
+
+[] Confirm if sleep is working at all on webindex
+	[] Make WebIndex.sleep recursive
+	
 
 [] Setup flask
 	[] Need automatic creation of a little directory
