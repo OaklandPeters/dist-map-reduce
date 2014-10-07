@@ -60,6 +60,6 @@ def query_to_url(query):
     template = "find/{ips}/{start}/{end}/"
     return template.format(
         ips = query.ips,
-        start = query.start,
-        end = query.end
+        start = query.timerange.start,
+        end = query.timerange.end
     )

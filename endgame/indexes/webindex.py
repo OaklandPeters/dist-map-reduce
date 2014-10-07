@@ -58,12 +58,17 @@ class WebIndex(object):
             else:
                 raise TypeError("Invalid 'index': should be IndexDispatcher, "
                     "or path to config file or data directory.")
+    @property
+    def confpath(self):
+        return self.index.confpath
 
     def map(self, query):
-        pass
+        return self.index.map(query)
     def reduce(self, records, query):
-        pass
-
+        return self.index.reduce(records, query)
+    def find(self, query):
+        records = self.map(query)
+        return self.reduce(records, query)
     #--------------------------------------------------------------
     #    REST API
     #--------------------------------------------------------------
@@ -86,11 +91,13 @@ class WebIndex(object):
         return "Shutting down WebIndex"
     
     def process_up(self):
-        self.server = Process(target=self.app.run)
-        self.server.start
-    def process_down(self):
-        self.server.terminate()
-        self.server.join()
+        p = Process(target=startup_webindex, args=(self.confpath,))
+        p.start()
+        #p.join()
+        return p
+        
+        
+
     #Alternate shutdown - using multiprocessing
     #from multiprocessing import Process
 #     def process_up(self):
@@ -99,6 +106,12 @@ class WebIndex(object):
 #     def process_down(self):
 #         self.server.terminate()
 #         self.server.join()
+
+def startup_webindex(confpath):
+    index = IndexDispatcher(confpath)
+    web = WebIndex(index)
+    web.wake_up()
+    
 
 def shutdown_webindex():
     down = request.environ.get('werkzeug.server.shutdown')

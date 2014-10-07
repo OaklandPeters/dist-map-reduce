@@ -36,7 +36,7 @@ class WebIndexTests(unittest.TestCase):
         self.target_entry = stable_query.target_entry
         self.target_record = stable_query.target_record
         self.query = stable_query.query
-        
+        self.baseurl = 'http://127.0.0.1:5000/'
         # Example url:
         # http://127.0.0.1:5000/find/[3.42.225.161]/1412619807.79/1412619808.59/
 #     def test_basic(self):
@@ -44,17 +44,26 @@ class WebIndexTests(unittest.TestCase):
 #         web = WebIndex(index)
 # 
 #         web.wake_up(debug=True)
-    def test_from_urlquery(self):
+    def test_multiprocess(self):
+        index = IndexDispatcher(self.configpath)
+        web = WebIndex(index)
+        web.process_up()
         
+        results = web.find(self.query)
+        web.sleep()
         
+        self.assert_(len(results) >= 3)
+        self.assert_(self.target_record in results)
 
-        p = Process(target=launch, args=(self.configpath,))
-        p.start()
-        p.join()
+    def test_from_urldispatcher(self):
+        index = IndexDispatcher(self.configpath)
+        web = WebIndex(index)
+        web.process_up()
+        urldisp = URLDispatcher(self.baseurl)
+        urldisp.find(self.query)
+        
         print()
-        
-        
-        #Setup URLQuery, pointing to the webindex
+        #Setup URLDispatcher, pointing to the webindex
         #Send the call
         #Receive it, and decode from string
 

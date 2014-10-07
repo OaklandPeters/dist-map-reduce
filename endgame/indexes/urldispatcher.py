@@ -33,9 +33,7 @@ class URLDispatcher(IndexABC):
     def map(self, query):
         self.wake_up()  # presently does nothing
         fullurl = self.urlpath + query_to_url(query)
-        return [
-            send_request(full_url)
-        ]
+        return [send_request(fullurl)] #pylint: disable=no-value-for-parameter
 
     def reduce(self, records, query):
         """Flatten one-level of nesting, removing empty sequences, and then
@@ -112,8 +110,8 @@ class URLDispatcher(IndexABC):
             data = [repr(elm)[:20] for elm in self.data]
         )
 
-def send_request(self, full_url):
-    response = requests.get(full_url)
+def send_request(fullurl):
+    response = requests.get(fullurl)
     # Unpack this
     print()
     raise RuntimeError("Why aren't you debugging?")
