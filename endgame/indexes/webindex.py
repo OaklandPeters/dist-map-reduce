@@ -17,7 +17,7 @@ __all__ = ['WebIndex']
 
 #class WebIndex(object):
 class WebIndex(IndexABC):
-    def __init__(self, index):
+    def __init__(self, index, baseurl=None):
         """
         dispatcher: either an IndexDispatcher object, or a valid argument 
             into IndexDisptacher.__init__ - config file path, or data directory path 
@@ -26,9 +26,10 @@ class WebIndex(IndexABC):
         self.app = self.build_app()
         self.server = None # 'sleeping'
         self.process = None
-    
-        print(self.port)
-        print()
+        self.baseurl = baseurl
+
+
+
     
     @property
     def awake(self):
@@ -71,7 +72,9 @@ class WebIndex(IndexABC):
     def process_down(self):
         """I heavily doubt this works correctly.
         Consider it a placeholder."""
-        self.process.terminate()
+        if hasattr(self.process, 'terminate'):
+            #self.process.join()
+            self.process.terminate()
     
     def sleep(self, datano=None):
         if datano is None:
@@ -84,6 +87,7 @@ class WebIndex(IndexABC):
         #for elm in self.index.data:
         #    elm.sleep()
         self.index.sleep()
+            
         try:
             shutdown_webindex()
             return "Shutting down WebIndex '{0}'".format(self.name)
@@ -92,7 +96,9 @@ class WebIndex(IndexABC):
     def _sleep_datano(self, datano):
         """Put single data connection to sleep."""
         self.index.data[datano].sleep()
-
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.sleep()
+        self.process_down()
 
     def build_app(self):
         """Build app. Put url-map type converters in place, and then setup
@@ -128,13 +134,26 @@ class WebIndex(IndexABC):
             else:
                 raise TypeError("Invalid 'index': should be IndexDispatcher, "
                     "or path to config file or data directory.")
+    @VProperty
+    class baseurl(object):
+        def _get(self):
+            if not hasattr(self, '_baseurl'):
+                self._baseurl = 'http://127.0.0.1'
+            return self._baseurl
+        def _set(self, value):
+            self._baseurl = value
+        def _val(self, value):
+            if value is None:
+                return 'http://127.0.0.1'
+            if not isinstance(value, basestring):
+                raise TypeError("'baseurl' must be a basestring.")
+            return value
+    
     @property
     def name(self):
         return self.index.name
     @property
     def port(self):
-        
-        
         return self.index.config['port']
     @property
     def configpath(self):
@@ -144,7 +163,7 @@ class WebIndex(IndexABC):
     def valid(cls, instring):
         """Asks if instring is a valid WebIndex. Defers to IndexDispatcher.valid"""
         return IndexDispatcher.valid(instring)
-
+    _baseurl = 'http://'
     #--------------------------------------------------------------
     #    REST API
     #--------------------------------------------------------------

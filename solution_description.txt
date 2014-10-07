@@ -1,3 +1,19 @@
+
+Dependencies
+--------------
+This implementation should run on Windows, and should run in Linux with a small amount of updating - I got this working on Linux (Redhat) when it was ~75% done, but the work since then has not been tested.
+
+This was coded in Python 2.7, and many of the features were tested to be compatible with 2.6 - but, as before, the most recent rounds of development have not been tested in Python 2.6.
+
+External library dependencies include: flask, werkzeug, and requests.
+
+		Windows
+		Python 2.7
+		Libraries: flask, werkzeug, requests
+
+I make a few assumptions about the data. First
+
+
 Describe context of solution:
 	assumptions
 	limitations

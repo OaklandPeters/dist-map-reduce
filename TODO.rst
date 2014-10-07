@@ -1,49 +1,16 @@
 Immediate work-plan
 -----------------------
-[] static sleep response
-	[] Use sleeper: self.sleep_response
-[] updating config['port'] on closeout/sleep
+
+
+
+
+
+Remaining Work:
+[] Resolve the unclosed processes problem
+[] Setup 'Monitor' - to initialize the WebIndex when requested
+[] Further testing fo distributed REST API - real not simulated
+
 	
-	
-
-
-
-[] Get indexdispatcher using write_config
-	[] Have it trigger on shutdown - to reflect port
-[] Add context-manager to IndexABC
-
-[] Have indexdispatcher config files be created with a port number
-	[] Somehow different from one another
-
-[] Allow config to be changed by indexdispatcher
-
-[] IndexDispatcher: port number
-	[] Record in config file
-	[] Read from config file
-	[] access during construction
-		[] Find out if it needs to be int or str
-
-test_urldispatcher_to_urldispatcher
-		
-
-
-[] Confirm if sleep is working at all on webindex
-	[] Make WebIndex.sleep recursive
-	
-
-[] Setup flask
-	[] Need automatic creation of a little directory
-	[] Which provides REST access:
-		[] Query (url query) --> maps across directories --> returns results
-	[] Receive requests for individual indexes/folders
-	[] Map those folders onto a config file
-		[] Maybe generate the config file for a folder, as needed
-	[] Generate the IndexDispatcher object for the config file
-	[] Pass down to the command the IndexDispatcher
-
-[] What needs to be in the URL namespace of the servers?
-	[] Whatever is in it's config
-		
 
 WRITEUP
 	[] Assumptions

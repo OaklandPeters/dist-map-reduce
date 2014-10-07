@@ -25,6 +25,10 @@ class URLDispatcher(IndexABC):
         self.urlpath = self._validate_urlpath(urlpath)
         self.data = None # 'sleeping'
     
+    @classmethod
+    def from_url_parts(cls, base, port):
+        return cls("{0}:{1}/".format(base, port))
+    
     #--------------------------------------------------------------------------
     #    Map/Reduce
     #--------------------------------------------------------------------------
@@ -59,12 +63,14 @@ class URLDispatcher(IndexABC):
         In any case, it should be one of the last things coded
         """
         # Send HTTP request for list of data indexed by web-server
+        self.data = self.urlpath
         
     def sleep(self):
         """Have the destination fold itself down to sleep."""
         self.urlpath+'/shutdown'
-        for index in self.data:
-            index.sleep()
+        if hasattr(self.data, '__iter__'):
+            for index in self.data:
+                index.sleep()
         self.data = None
     
     #--------------------------------------------------------------------------
@@ -97,20 +103,26 @@ class URLDispatcher(IndexABC):
     #--------------------------------------------------------------------------
     #    Magic Methods
     #--------------------------------------------------------------------------
+    def _dataitermap(self, func):
+        if hasattr(self.data, '__iter__'):
+            return [func(elm)[:20] for elm in self.data]
+        else:
+            return func(self.data)[:20]
     def __str__(self):
         return "{name}({data})".format(
             name = type(self).__name__,
-            #data = str(self.data)
             #... limit length displayed
-            data = [str(elm)[:20] for elm in self.data]
+            #data = [str(elm)[:20] for elm in self.data]
+            data = self._dataitermap(str)
         )
     def __repr__(self):
         return "{name}({data})".format(
             name = type(self).__name__,
-            #data = repr(self.data)
             #... limit length displayed
-            data = [repr(elm)[:20] for elm in self.data]
+            #data = [repr(elm)[:20] for elm in self.data]
+            data = self._dataitermap(repr)
         )
+
 
 def send_request(fullurl):
     response = requests.get(fullurl)

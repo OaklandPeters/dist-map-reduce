@@ -37,7 +37,9 @@ class WebIndexTests(unittest.TestCase):
         self.target_entry = stable_query.target_entry
         self.target_record = stable_query.target_record
         self.query = stable_query.query
-        self.baseurl = 'http://127.0.0.1:5000/'
+        self.baseurl = 'http://127.0.0.1'
+        self.port = 5005
+        self.fullurl = self.baseurl+":"+str(self.port)+"/"
         # Example url:
         # http://127.0.0.1:5000/find/[3.42.225.161]/1412619807.79/1412619808.59/
         
@@ -47,31 +49,62 @@ class WebIndexTests(unittest.TestCase):
         web = WebIndex(index)
   
         web.wake_up(debug=True)
-        print()
         
     def test_multiprocess(self):
         index = IndexDispatcher(self.metapath)
-        #with WebIndex(index) as web:
-        web = WebIndex(index)
-        web.process_up()
-        results = web.find(self.query)
-        web.sleep()
+        
+        with WebIndex(index) as web:
+            web.process_up()
+            results = web.find(self.query)
+            
+        #web = WebIndex(index)
+        #web.process_up()
+        #results = web.find(self.query)
+        #web.sleep()
         
         self.assert_(len(results) >= 3)
         self.assert_(self.target_record in results)
 
     def test_from_urldispatcher(self):
         index = IndexDispatcher(self.metapath)
-        web = WebIndex(index)
-        web.process_up(debug=True)
-        urldisp = URLDispatcher(self.baseurl)
-        results = urldisp.find(self.query)
+        
+        with WebIndex(index) as web:
+            web.process_up()
+            
+            urldisp = URLDispatcher.from_url_parts(self.baseurl, self.port)
+            results = urldisp.find(self.query)
+            
+#             with URLDispatcher.from_url_parts(self.baseurl, self.port) as urldisp:
+#                 results = urldisp.find(self.query)
+        
         self.assert_(len(results) >= 3)
         self.assert_(self.target_record in results)
     
     def test_urldispatcher_to_urldispatcher(self):
-        pass
+        index1 = IndexDispatcher(self.metapath)
+        index2 = IndexDispatcher(self.metapath2)
         
+        # Web-server/REST API #1
+        with WebIndex(index1) as web1:
+            web1.process_up()
+            
+            # Web-server/REST API #2
+            with WebIndex(index2) as web2:
+                web2.process_up()
+                
+                web2.index.wake_up()
+                for i, elm in enumerate(web2.index.data):
+                    results = elm.find(self.query)
+                    if i == 0:
+                        self.assert_(len(results) >= 1)
+                        self.assert_(isinstance(elm, IndexDispatcher))
+                    elif i == 1:
+                        self.assert_(len(results) >= 0)
+                        self.assert_(isinstance(elm, IndexDispatcher))
+                    elif i == 2:
+                        self.assert_(len(results) >= 3)
+                        self.assert_(isinstance(elm, URLDispatcher))
+                    print(i, type(elm).__name__, elm.find(self.query))
 
 
 
