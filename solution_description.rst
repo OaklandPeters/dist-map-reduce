@@ -29,11 +29,11 @@ Then, this command is recursively mapped onto the targets listed in the WebIndex
 Architecture and Major Classes
 ---------------------------------
 Container Heirarchy:
- * IndexABC
-   * WebIndex
-   * IndexDispatcher
-   * URLDispatcher
-   * RecordChunk
+ * IndexABC: abstract interface for the following. Defines abstract functions: map/reduce/find, wake_up/sleep, valid (used for dispatching over child classes).
+ * IndexDispatcher: responsible for recursively mapping to other objects
+ * WebIndex: web server. Wraps around an IndexDispatcher
+ * URLDispatcher: abstraction layer, ie IndexDispatcher--URLDispatcher-->WebIndex. Sends requests.
+ * RecordChunk: interface over a single log file. Responsible for actual file-scan.
 
 Data Objects
  * Query
@@ -42,9 +42,8 @@ Data Objects
 
 Total Size:
 ------------------
-~3000 lines of code (counting whitespace and unittests)
+~3000 lines of code (counting whitespace and unittests, not counting write-up)
 47 source files
-
 
 
 Dependencies
@@ -61,38 +60,21 @@ I make a few assumptions about the data and the nature of the requests. First, I
 
 Secondly, I assume that we are only interested in the 'forward question': "GIVEN a time-range, find all occurence of these IP addresses". The 'reverse question': "GIVEN these IP addresses, find all times they occur" - would be efficiently solved by a *very* different architecture.
 
-Third, I assume that memory is plentiful. A log file is loaded into memory before querying. If insead, we wished to streamline memory use -- I would use an 'offline' scan mode -- IE RecordChunk.map would not 'wake_up' - and would instead wrap and defer GREP or a similar very-low level text-scan utility.
+Third, I assume that memory is plentiful. A log file is loaded into a Python data-structure before querying. If insead, we wished to streamline memory use -- this would need to take advantage of a lower-level text-scan facility. For example, the search could be re-coded with 'ctypes', or as a wrapper around a 'GREP' like facilitity.
+
+Testing
+==================
+The most 'high-level' tests are located in `test_web.py`, which tests the ability of WebIndex applications to communicate, both via function and HTTP request. Talk to me for a more detailed description.
 
 
 Future Work
 ==================
 
 Binary Search
-  ...
+  RecordChunk currently uses a direct linear scan of the memory entries - taking O(N) time and O(N) memory. This could be improved to O(log N) time by employing a simple binary-search.
+  
 TimeRange Preemption
-  ...
-'Offline' Search - Grep
-  Memory saving mode.
+  Since I assume that log files are individually laid out in continuous order, configuration files which index RecordChunk files could track the min and max time-stamp. Thus, any query using a time range which does not overlap with [min, max] could be pre-emptively dismissed.
+
 Circular Call
-  ...
-Orphan processes
-  ....
-
-
-
-Describe context of solution:
-	assumptions
-	limitations
-	dependencies
-		packages
-		operating systems
-		temp disks
-		memory requirements
-
-Describe Primary tests:
-
-Describe efficiency constraints:
-	Space: disk
-	Space: memory
-	Time: lookup
-	Time: loading
+  The recursive data structures (IndexDispatcher) currently do not track a 'path-history'. Consequently, you can build log-files which create loops - with predictable consequences.
