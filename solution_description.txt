@@ -1,17 +1,76 @@
 
+Overview
+=================
+I focused on the 'distributed' aspect of this problem when developing this architecture. Hence, I built a distributed recursive data-structure, out of a few container class. The 'distributed' component is handled by a REST API, delivered by simple and (relatively) automatically generated web applications (via Flask). 
+
+Task distribution is basic Map/Reduce (which are defined for every class involved in the recursive structure). Every 'live' (in memory) class corresponds to a 'sleeping' data file - either a raw log file (CSV) or a configuration file (JSON).
+
+
+Query Process
+---------------
+Thus, a query process would go like this... a web-application is launched based on a configuration file which provides some combination of (1) the URLs of other remote web-applications, and (2) the file-paths of other configuration files - usually corresponding to a directory worth of configuration files, although this is not required. A query, consisting of a list of IPv4 addresses, and a time range (given vis POSIX time-stamps) is given to the web-service - either via a Python method call, or via it's REST API. For example::
+
+	# Method:
+	WebIndex(...).find(
+		Query('3.42.225.161', (1412619807.79, 1412619808.59))
+	)
+
+	# HTTP Request
+	requests.get(
+		'http://127.0.0.1:5005/find/[3.42.225.161]/1412619807.79/1412619808.59/'
+	)
+	# Flask decoding rule:
+	find_rule = '/find/<list:ips>/<float:start>/<float:end>/'
+
+Then, this command is recursively mapped onto the targets listed in the WebIndex's
+
+	
+
+Architecture and Major Classes
+---------------------------------
+IndexABC
+	WebIndex
+	IndexDispatcher
+	URLDispatcher
+	RecordChunk
+
+Query
+Record
+TimeRange
+
+Total Size:
+------------------
+~3000 lines of code (raw; no qualifications).
+
+
+
 Dependencies
 --------------
 This implementation should run on Windows, and should run in Linux with a small amount of updating - I got this working on Linux (Redhat) when it was ~75% done, but the work since then has not been tested.
 
 This was coded in Python 2.7, and many of the features were tested to be compatible with 2.6 - but, as before, the most recent rounds of development have not been tested in Python 2.6.
 
-External library dependencies include: flask, werkzeug, and requests.
+External Python package dependencies include: flask, werkzeug, and requests.
 
-		Windows
-		Python 2.7
-		Libraries: flask, werkzeug, requests
+Assumptions
+-------------
+I make a few assumptions about the data and the nature of the requests. First, I assume that the timestamps of log entries are placed into each file in time-order. This allows several preformance enhancements (particularly see the 'Future Work').
 
-I make a few assumptions about the data. First
+
+Future Work
+==================
+
+Binary Search
+  ...
+TimeRange Preemption
+  ...
+'Offline' Search - Grep
+  Memory saving mode.
+Circular Call
+  ...
+Orphan processes
+  ....
+
 
 
 Describe context of solution:
@@ -23,6 +82,7 @@ Describe context of solution:
 		temp disks
 		memory requirements
 
+Describe Primary tests:
 
 Describe efficiency constraints:
 	Space: disk
