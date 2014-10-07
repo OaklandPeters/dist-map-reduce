@@ -75,3 +75,6 @@ if __name__ == "__main__":
     Stable4.make()
     from .make_sample_query import make_sample
     make_sample() # setup query file - for unittests
+    
+    from .set_config_files import set_stable_configs
+    set_stable_configs()

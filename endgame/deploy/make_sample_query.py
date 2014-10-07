@@ -5,7 +5,10 @@ import random
 from endgame.interfaces import Record, Query
 
 
-testdir = os.path.split(__file__)[0]
+testdir = os.path.join(
+    os.path.split(__file__)[0],
+    '..', 'test'
+)
 datadir = os.path.join(testdir, 'datafiles')
 os.chdir(datadir)
 

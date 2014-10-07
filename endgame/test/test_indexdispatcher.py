@@ -11,7 +11,6 @@ datadir = os.path.join(testdir, 'datafiles')
 os.chdir(datadir)
 
 
-
 class IndexDispatcherTests(unittest.TestCase):
     """
     Note that the target_record naturally occurs in stable_1k_2.csv

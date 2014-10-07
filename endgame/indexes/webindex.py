@@ -15,8 +15,8 @@ from werkzeug.routing import BaseConverter
 __all__ = ['WebIndex']
 
 
-class WebIndex(object):
-#class WebIndex(IndexABC):
+#class WebIndex(object):
+class WebIndex(IndexABC):
     def __init__(self, index):
         """
         dispatcher: either an IndexDispatcher object, or a valid argument 
@@ -26,6 +26,15 @@ class WebIndex(object):
         self.app = self.build_app()
         self.server = None # 'sleeping'
         self.process = None
+    
+        print(self.port)
+        print()
+    
+    @property
+    def awake(self):
+        return self.app
+        #INVALID
+    
 
     #--------------------------------------------------------------------------
     #    Map/Reduce
@@ -42,25 +51,52 @@ class WebIndex(object):
     #    App Up/Down
     #--------------------------------------------------------------------------
     def wake_up(self, *args, **kwargs):
+        if 'port' not in kwargs:
+            kwargs['port'] = self.port
         ret = self.app.run(*args, **kwargs)
         print(ret)
         return ret
     
         return self.app.run(*args, **kwargs)
-    
+    def process_up(self, *args, **kwargs):
+        self.process = Process(
+            target=startup_webindex,
+            args=(self.configpath,)+args,
+            kwargs=kwargs
+        )
+        
+        self.process.start()
+        #p.join()
+        return self.process
+    def process_down(self):
+        """I heavily doubt this works correctly.
+        Consider it a placeholder."""
+        self.process.terminate()
     
     def sleep(self, datano=None):
         if datano is None:
-            for elm in self.index.data:
-                elm.sleep()
+            self._sleep_all()
+        elif isinstance(datano, int):
+            self._sleep_datano(datano)
+    def _sleep_all(self):
+        """Put index (and its data) to sleep - and then shutdown webserver."""
+        # Note: index.sleep should already recursively put it's data to sleep
+        #for elm in self.index.data:
+        #    elm.sleep()
         self.index.sleep()
         try:
             shutdown_webindex()
             return "Shutting down WebIndex '{0}'".format(self.name)
         except WebSleepError:
             return "WebIndex '{0}' appears to be already shutdown."
+    def _sleep_datano(self, datano):
+        """Put single data connection to sleep."""
+        self.index.data[datano].sleep()
+
 
     def build_app(self):
+        """Build app. Put url-map type converters in place, and then setup
+        REST API."""
         app = Flask(self.index.name)
         app.url_map.converters['list'] = ListConverter
         app.url_map.converters['float'] = FloatConverter
@@ -69,11 +105,8 @@ class WebIndex(object):
             return self.find_response(*args, **kwargs)
         def sleeper(*args, **kwargs):
             return self.sleep_response(*args, **kwargs)
-        #finder = lambda *args, **kwargs: self.find_response(*args, **kwargs)
-        #sleeper = lambda *args, **kwargs: self.sleep_response(*args, **kwargs)
         
         app.route(self.find_rule)(finder)
-        #app.route(self.static_sleep_rule)(self.static_sleep_response)
         app.route(self.sleep_rule)(sleeper)
         
         return app
@@ -100,11 +133,17 @@ class WebIndex(object):
         return self.index.name
     @property
     def port(self):
+        
+        
         return self.index.config['port']
     @property
     def configpath(self):
         return self.index.configpath
-
+    # Validation
+    @classmethod
+    def valid(cls, instring):
+        """Asks if instring is a valid WebIndex. Defers to IndexDispatcher.valid"""
+        return IndexDispatcher.valid(instring)
 
     #--------------------------------------------------------------
     #    REST API
@@ -119,26 +158,17 @@ class WebIndex(object):
         
     
     sleep_rule = '/sleep/<int:datano>/'
-    #def sleep_response(self, datano=None):
-    #    self.sleep()
-    def sleep_response(self):
-        shutdown_webindex()
+    def sleep_response(self, datano=None):
+        self.sleep(datano=datano)
+    #def sleep_response(self):
+    #    shutdown_webindex()
     
     static_sleep_rule = '/sleep'
     @staticmethod
     def static_sleep_response():
         shutdown_webindex()
 
-    def process_up(self, *args, **kwargs):
-        self.process = Process(
-            target=startup_webindex,
-            args=(self.configpath,)+args,
-            kwargs=kwargs
-        )
-        
-        self.process.start()
-        #p.join()
-        return self.process
+    
         
         
 

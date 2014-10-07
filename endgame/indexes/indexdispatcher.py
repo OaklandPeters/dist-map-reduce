@@ -23,22 +23,12 @@ class IndexDispatcher(IndexABC):
         if not os.path.exists(self.configpath):
             self.write(self.dirpath, port=self.port)
         self.config = self.read_config()
-        
-        
-        # If port is provided - use it (whether config['port'] exists or not)
-#         if port is not None:
-#             self.config['port'] = port    
-#         else: # Default - 
-#             if 'port' not in self.config:
-#                 self.config['port'] = 5000
-
-            
-            
         self.data = None # 'sleeping'
 
     @VProperty
     class port(object):
-        """Port number for this, if used as a webindex."""
+        """Port number for this, if used as a webindex.
+        Stored in the config file."""
         def _get(self):
             if 'port' not in self.config: #pylint: disable=no-member
                 self.config['port'] = 5000 #pylint: disable=no-member
@@ -135,7 +125,7 @@ class IndexDispatcher(IndexABC):
             return json.load(config_file) #pylint: disable=attribute-defined-outside-init
     def write_config(self):
         with open(self.configpath, 'w') as config_file:
-            json.dump(self.config, config_file)
+            json.dump(dict(self.config), config_file)
     # ----------------------------   Wake/Sleep Interface
     @property
     def awake(self):
@@ -144,10 +134,11 @@ class IndexDispatcher(IndexABC):
         else:
             return True
     def sleep(self):
-        """Recursively remove data."""
+        """Recursively remove data, and record config to disk."""
         if self.awake:
             for index in self.data:
                 index.sleep()
+        self.write_config()
         self.data = None
     def wake_up(self):
         self.data = list(self.wake_iter())
@@ -181,10 +172,6 @@ class IndexDispatcher(IndexABC):
             self._config = value
         def _del(self):
             del self._config
-
-    @property
-    def port(self):
-        return self.config.get('port', 5000) #pylint: disable=no-member
     
     #--------------------------------------------------------------------------
     #    Magic Methods
@@ -194,16 +181,23 @@ class IndexDispatcher(IndexABC):
 #         if not self.awake:
 #             self.wake_up()
 #         return iter(self.data)
+    def _dataitermap(self, func):
+        if hasattr(self.data, '__iter__'):
+            return [func(elm)[:20] for elm in self.data]
+        else:
+            return func(self.data)[:20]
     def __str__(self):
         return "{name}({data})".format(
             name = type(self).__name__,
             #... limit length displayed
-            data = [str(elm)[:20] for elm in self.data]
+            #data = [str(elm)[:20] for elm in self.data]
+            data = self._dataitermap(str)
         )
     def __repr__(self):
         return "{name}({data})".format(
             name = type(self).__name__,
             #... limit length displayed
-            data = [repr(elm)[:20] for elm in self.data]
+            #data = [repr(elm)[:20] for elm in self.data]
+            data = self._dataitermap(repr)
         )
 

@@ -2,9 +2,7 @@ from __future__ import absolute_import
 import unittest
 import os
 
-from endgame.indexes import IndexDispatcher, directory_to_config, RecordChunk
-from endgame.interfaces import Query, Record
-#import endgame.test.stable_query as stable_query
+from endgame.indexes import IndexDispatcher
 import endgame.test.sample_query as stable_query
 
 testdir = os.path.split(__file__)[0]

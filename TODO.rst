@@ -23,6 +23,9 @@ Immediate work-plan
 	[] access during construction
 		[] Find out if it needs to be int or str
 
+test_urldispatcher_to_urldispatcher
+		
+
 
 [] Confirm if sleep is working at all on webindex
 	[] Make WebIndex.sleep recursive
@@ -42,6 +45,11 @@ Immediate work-plan
 	[] Whatever is in it's config
 		
 
+WRITEUP
+	[] Assumptions
+		Windows
+		Python 2.7
+		Libraries: flask, werkzeug, requests
 
 ---- IMPROVEMENTS:
 [] TIMETEST! 

@@ -40,12 +40,15 @@ class WebIndexTests(unittest.TestCase):
         self.baseurl = 'http://127.0.0.1:5000/'
         # Example url:
         # http://127.0.0.1:5000/find/[3.42.225.161]/1412619807.79/1412619808.59/
-    def test_basic(self):
+        
+    
+    def unusued_test_basic(self):
         index = IndexDispatcher(self.metapath)
         web = WebIndex(index)
- 
+  
         web.wake_up(debug=True)
         print()
+        
     def test_multiprocess(self):
         index = IndexDispatcher(self.metapath)
         #with WebIndex(index) as web:

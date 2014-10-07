@@ -5,17 +5,14 @@
 """
 
 from __future__ import absolute_import
-import os
-import json
 import requests
 import ast
-from ..interfaces import IndexABC, Record, Query
-from .indexdispatcher import IndexDispatcher
-from .shared import is_nonstringsequence, directory_to_config, flatten, query_to_url
+from ..interfaces import IndexABC, Record
+#from .indexdispatcher import IndexDispatcher
+from .shared import flatten, query_to_url
 
 __all__ = ['URLDispatcher']
 
-#class URLDispatcher(IndexDispatcher):
 class URLDispatcher(IndexABC):
     """
     Interacts with a remote URL (which is expected to in turn be an IndexDispatcher).
