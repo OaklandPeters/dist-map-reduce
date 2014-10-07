@@ -60,6 +60,12 @@ class IndexDispatcherTests(unittest.TestCase):
         self.assert_(self.target_record in results)
         self.assert_(len(results) >= 2)
 
+    def test_name(self):
+        disp = IndexDispatcher(self.dirpath)
+        self.assertEqual(disp.name, 'stable_dispatcher')
+        
+        disp2 = IndexDispatcher('stable_dispatcher.json')
+        self.assertEqual(disp2.name, 'stable_dispatcher')
 
 if __name__ == "__main__":
     unittest.main()

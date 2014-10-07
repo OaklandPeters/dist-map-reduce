@@ -21,6 +21,11 @@ class IndexDispatcher(IndexABC):
             self.write(self.dirpath)
         self.data = None # 'sleeping'
     
+    @property
+    def name(self):
+        _, confname = os.path.split(self.confpath)
+        name, _ = os.path.splitext(confname)
+        return name
     
     #--------------------------------------------------------------------------
     #    Map/Reduce
@@ -145,3 +150,4 @@ class IndexDispatcher(IndexABC):
             #... limit length displayed
             data = [repr(elm)[:20] for elm in self.data]
         )
+

@@ -9,7 +9,7 @@ import os
 import json
 from ..interfaces import IndexABC
 from .indexdispatcher import IndexDispatcher
-from .shared import is_nonstringsequence, directory_to_config
+from .shared import is_nonstringsequence, directory_to_config, flatten
 
 __all__ = ['URLDispatcher']
 
@@ -17,7 +17,7 @@ __all__ = ['URLDispatcher']
 class URLDispatcher(IndexABC):
     """
     Interacts with a remote URL (which is expected to in turn be an IndexDispatcher).
-    
+    Corresponds to URL of a miniserver.
     
     @todo: Overwrite read/write from IndexDispatcher
     
@@ -83,16 +83,16 @@ class URLDispatcher(IndexABC):
             else:
                 raise ValueError("Invalid url.")
     @classmethod
-    def valid_url(cls, url):
+    def valid_urlpath(cls, urlpath):
         try:
-            cls._validate_url(url)
+            cls._validate_urlpath(urlpath)
         except (ValueError, TypeError):
             return False
         else:
             return True
     @classmethod
     def valid(cls, value):
-        return cls.valid_url(value)
+        return cls.valid_urlpath(value)
 
     #--------------------------------------------------------------------------
     #    Magic Methods

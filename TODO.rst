@@ -1,6 +1,8 @@
 Immediate work-plan
 -----------------------
 
+! Need to find a way to wrap a Flask instance around an IndexDispatcher
+
 [] urldispatcher:
 	[] corresponds to URL of a miniserver
 	[] wake_up(): confirms miniserver is awake, and then populates data with single entry
