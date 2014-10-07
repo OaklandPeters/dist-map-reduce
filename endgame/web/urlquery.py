@@ -62,29 +62,6 @@ def find(ips='a', lower=0.0, upper=0.0):
     return msg
         
 
-# @app.route('/')
-# def data():
-#     # here we want to get the value of user (i.e. ?user=some-value)
-#     
-#     raw_ips = request.args.get('ips')
-#     raw_timerange = request.args.get('timerange')
-#     
-#     ips = json.loads(raw_ips)
-#     timerange = json.loads(raw_timerange)
-#     #ips = raw_ips
-#     #timerange = raw_timerange
-#     
-#     
-#     msg = ""
-#     msg += "ips {klass}: {value}\n".format(
-#         klass = type(ips).__name__, value = ips
-#     )
-#     msg += "\n"
-#     msg += "timerange {klass}: {value}\n".format(
-#         klass = type(timerange).__name__, value = timerange
-#     )
-#     return msg
-
 
 
 #==============================================================================

@@ -54,3 +54,12 @@ def is_nonstringsequence(value):
 def flatten(seq_of_seq):
     "Flatten one level of nesting"
     return itertools.chain.from_iterable(seq_of_seq)
+
+def query_to_url(query):
+    """Convert a query object to a URL query term."""
+    template = "find/{ips}/{start}/{end}/"
+    return template.format(
+        ips = query.ips,
+        start = query.start,
+        end = query.end
+    )
