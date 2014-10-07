@@ -7,9 +7,10 @@
 from __future__ import absolute_import
 import os
 import json
+import requests
 from ..interfaces import IndexABC
 from .indexdispatcher import IndexDispatcher
-from .shared import is_nonstringsequence, directory_to_config, flatten
+from .shared import is_nonstringsequence, directory_to_config, flatten, query_to_url
 
 __all__ = ['URLDispatcher']
 
@@ -30,20 +31,18 @@ class URLDispatcher(IndexABC):
     #    Map/Reduce
     #--------------------------------------------------------------------------
     def map(self, query):
-        self.wake_up()
+        self.wake_up()  # presently does nothing
+        fullurl = self.urlpath + query_to_url(query)
         return [
-            elm.find(query)
-            for elm in self.data
+            send_request(full_url)
         ]
+
     def reduce(self, records, query):
         """Flatten one-level of nesting, removing empty sequences, and then
         return records sorted by timestamp."""
         flattened = flatten(records)
         processed = sorted(flattened, key=lambda record: record.timestamp)
         return processed
-    
-    def make_url_string(self, ips, timerange):
-        pass
         
     
     
@@ -63,6 +62,7 @@ class URLDispatcher(IndexABC):
         
     def sleep(self):
         """Have the destination fold itself down to sleep."""
+        self.urlpath+'/shutdown'
         for index in self.data:
             index.sleep()
         self.data = None
@@ -112,3 +112,9 @@ class URLDispatcher(IndexABC):
             data = [repr(elm)[:20] for elm in self.data]
         )
 
+def send_request(self, full_url):
+    response = requests.get(full_url)
+    # Unpack this
+    print()
+    raise RuntimeError("Why aren't you debugging?")
+    return response

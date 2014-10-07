@@ -1,6 +1,6 @@
 import json
 from flask import request, Flask
-from flask.ext import restful
+#from flask.ext import restful
 from werkzeug.routing import BaseConverter
 
 from endgame.interfaces import Record, Query

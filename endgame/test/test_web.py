@@ -9,9 +9,9 @@ from __future__ import absolute_import
 import os
 import unittest
 from flask import Flask
-from endgame.indexes import URLDispatcher
+from multiprocessing import Process
+from endgame.indexes import URLDispatcher, WebIndex, IndexDispatcher
 from endgame.interfaces import Query, Record
-
 import endgame.test.stable_query as stable_query
 
 # Center on data directory
@@ -24,15 +24,41 @@ os.chdir(datadir)
 # (3) And later stop the process?
 
 
-class FlaskTests(unittest.TestCase):
+def launch(configpath):
+    index = IndexDispatcher(configpath)
+    web = WebIndex(index)
+    web.wake_up(debug=True)
+
+
+class WebIndexTests(unittest.TestCase):
     def setUp(self):
         self.configpath = os.path.join(datadir, 'stable_metaindex.json')
         self.target_entry = stable_query.target_entry
         self.target_record = stable_query.target_record
         self.query = stable_query.query
         
-        # [] boot up web-server
-    def test_find(self):
-        #urldisp = URLDispatcher(self.configpath)
-        #urldisp.find(query)
-        pass
+        # Example url:
+        # http://127.0.0.1:5000/find/[3.42.225.161]/1412619807.79/1412619808.59/
+#     def test_basic(self):
+#         index = IndexDispatcher(self.configpath)
+#         web = WebIndex(index)
+# 
+#         web.wake_up(debug=True)
+    def test_from_urlquery(self):
+        
+        
+
+        p = Process(target=launch, args=(self.configpath,))
+        p.start()
+        p.join()
+        print()
+        
+        
+        #Setup URLQuery, pointing to the webindex
+        #Send the call
+        #Receive it, and decode from string
+
+
+
+if __name__ == "__main__":
+    unittest.main()
